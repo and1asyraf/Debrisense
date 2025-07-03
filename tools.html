@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGO Tools - DebriSense</title>
+    <meta name="description" content="Tools and resources for environmental NGOs and cleanup organizers">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Navigation Placeholder -->
+        <div id="navbar-placeholder"></div>
+        
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Sidebar -->
+                    <div class="col-md-3">
+                        <div id="sidebar-placeholder"></div>
+                    </div>
+                    
+                    <!-- Main Content Area -->
+                    <div class="col-md-9">
+                        <!-- Page Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h1 class="mb-1">
+                                    <i class="fas fa-tools me-2"></i>
+                                    NGO Tools & Resources
+                                </h1>
+                                <p class="text-muted mb-0">
+                                    Tools and resources to support environmental organizations and cleanup planning
+                                </p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary" onclick="exportAllTools()">
+                                    <i class="fas fa-download me-2"></i>
+                                    Export All
+                                </button>
+                                <button class="btn btn-primary" onclick="showHelpModal()">
+                                    <i class="fas fa-question-circle me-2"></i>
+                                    Help
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tools Grid -->
+                        <div class="row">
+                            <!-- Cleanup Planning Tool -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-calendar-alt me-2"></i>
+                                            Cleanup Planning Tool
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            Generate targeted cleanup plans based on risk predictions and historical data.
+                                        </p>
+                                        <div class="mb-3">
+                                            <label class="form-label">Select Region</label>
+                                            <select class="form-select" id="planningRegion" aria-label="Select region for cleanup planning">
+                                                <option value="">Choose a region...</option>
+                                                <option value="Selangor">Selangor</option>
+                                                <option value="Penang">Penang</option>
+                                                <option value="Sabah">Sabah</option>
+                                                <option value="Johor">Johor</option>
+                                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Time Period</label>
+                                            <select class="form-select" id="planningPeriod" aria-label="Select time period for cleanup planning">
+                                                <option value="1m">Next Month</option>
+                                                <option value="3m">Next 3 Months</option>
+                                                <option value="6m">Next 6 Months</option>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-primary w-100" onclick="generateCleanupPlan()">
+                                            <i class="fas fa-magic me-2"></i>
+                                            Generate Plan
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Risk Assessment Tool -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-chart-line me-2"></i>
+                                            Risk Assessment Tool
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            Assess pollution risk for specific locations and get detailed analysis.
+                                        </p>
+                                        <div class="mb-3">
+                                            <label class="form-label">Location</label>
+                                            <input type="text" class="form-control" id="riskLocation" placeholder="Enter location name">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">River (Optional)</label>
+                                            <input type="text" class="form-control" id="riskRiver" placeholder="Enter river name">
+                                        </div>
+                                        <button class="btn btn-primary w-100" onclick="assessRisk()">
+                                            <i class="fas fa-search me-2"></i>
+                                            Assess Risk
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Data Export Tool -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-file-export me-2"></i>
+                                            Data Export Tool
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            Export filtered data in various formats for analysis and reporting.
+                                        </p>
+                                        <div class="mb-3">
+                                            <label class="form-label">Data Type</label>
+                                            <select class="form-select" id="exportDataType" aria-label="Select data type for export">
+                                                <option value="cleanup">Cleanup Reports</option>
+                                                <option value="predictions">Risk Predictions</option>
+                                                <option value="observations">Observations</option>
+                                                <option value="all">All Data</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Format</label>
+                                            <select class="form-select" id="exportFormat" aria-label="Export format">
+                                                <option value="csv">CSV</option>
+                                                <option value="json">JSON</option>
+                                                <option value="xlsx">Excel</option>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-primary w-100" onclick="exportData()">
+                                            <i class="fas fa-download me-2"></i>
+                                            Export Data
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Report Generator -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-file-pdf me-2"></i>
+                                            Report Generator
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            Generate comprehensive reports for stakeholders and funding applications.
+                                        </p>
+                                        <div class="mb-3">
+                                            <label class="form-label">Report Type</label>
+                                            <select class="form-select" id="reportType" aria-label="Report type">
+                                                <option value="summary">Executive Summary</option>
+                                                <option value="detailed">Detailed Analysis</option>
+                                                <option value="funding">Funding Proposal</option>
+                                                <option value="stakeholder">Stakeholder Report</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Time Range</label>
+                                            <select class="form-select" id="reportTimeRange" aria-label="Report time range">
+                                                <option value="1m">Last Month</option>
+                                                <option value="3m">Last 3 Months</option>
+                                                <option value="6m">Last 6 Months</option>
+                                                <option value="1y">Last Year</option>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-primary w-100" onclick="generateReport()">
+                                            <i class="fas fa-file-alt me-2"></i>
+                                            Generate Report
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Generated Results -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-clipboard-list me-2"></i>
+                                            Generated Results
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="generatedResults">
+                                            <div class="text-center text-muted py-5">
+                                                <i class="fas fa-tools fa-3x mb-3"></i>
+                                                <p>Use the tools above to generate results</p>
+                                                <small>Results will appear here after using any tool</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Resource Links -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-link me-2"></i>
+                                            Useful Resources
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>Government Resources</h6>
+                                                <ul class="list-unstyled">
+                                                    <li class="mb-2">
+                                                        <a href="#" class="text-decoration-none">
+                                                            <i class="fas fa-external-link-alt me-2"></i>
+                                                            Department of Environment Malaysia
+                                                        </a>
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <a href="#" class="text-decoration-none">
+                                                            <i class="fas fa-external-link-alt me-2"></i>
+                                                            National Marine Litter Policy 2021-2030
+                                                        </a>
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <a href="#" class="text-decoration-none">
+                                                            <i class="fas fa-external-link-alt me-2"></i>
+                                                            Marine Park Guidelines
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>NGO Resources</h6>
+                                                <ul class="list-unstyled">
+                                                    <li class="mb-2">
+                                                        <a href="#" class="text-decoration-none">
+                                                            <i class="fas fa-external-link-alt me-2"></i>
+                                                            Reef Check Malaysia
+                                                        </a>
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <a href="#" class="text-decoration-none">
+                                                            <i class="fas fa-external-link-alt me-2"></i>
+                                                            EcoKnights
+                                                        </a>
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <a href="#" class="text-decoration-none">
+                                                            <i class="fas fa-external-link-alt me-2"></i>
+                                                            International Coastal Cleanup Guide
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer Placeholder -->
+        <div id="footer-placeholder"></div>
+    </div>
+    
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-question-circle me-2"></i>
+                        Tools Help Guide
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Cleanup Planning Tool</h6>
+                            <p class="small">
+                                Generate targeted cleanup plans based on ML risk predictions. 
+                                Select a region and time period to get recommendations for optimal cleanup timing and locations.
+                            </p>
+                            
+                            <h6>Risk Assessment Tool</h6>
+                            <p class="small">
+                                Assess pollution risk for specific locations. Enter location details to get 
+                                detailed risk analysis and recommendations.
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Data Export Tool</h6>
+                            <p class="small">
+                                Export filtered data in various formats (CSV, JSON, Excel) for further analysis 
+                                or inclusion in reports and presentations.
+                            </p>
+                            
+                            <h6>Report Generator</h6>
+                            <p class="small">
+                                Generate comprehensive reports for different audiences including executive summaries, 
+                                detailed analyses, and funding proposals.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6>Tips for Best Results:</h6>
+                    <ul class="small">
+                        <li>Use filters in the sidebar to narrow down data before generating reports</li>
+                        <li>Combine multiple tools for comprehensive analysis</li>
+                        <li>Export data regularly for backup and sharing</li>
+                        <li>Use generated reports for stakeholder communication</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="data/mock-data.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/tools.js"></script>
+</body>
+</html> 

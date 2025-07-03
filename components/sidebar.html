@@ -1,0 +1,139 @@
+<!-- DebriSense Sidebar with Filters -->
+<div class="sidebar">
+    <h5 class="mb-3">
+        <i class="fas fa-filter me-2"></i>
+        Filters
+    </h5>
+    
+    <!-- Season Filter -->
+    <div class="filter-group">
+        <label class="form-label">Season</label>
+        <div class="btn-group w-100" role="group">
+            <input type="radio" class="btn-check" name="season" id="northeast" value="Northeast Monsoon" checked>
+            <label class="btn btn-outline-primary" for="northeast">Northeast</label>
+            
+            <input type="radio" class="btn-check" name="season" id="southwest" value="Southwest Monsoon">
+            <label class="btn btn-outline-primary" for="southwest">Southwest</label>
+        </div>
+    </div>
+    
+    <!-- State Filter -->
+    <div class="filter-group">
+        <label class="form-label">State</label>
+        <select class="form-select" id="stateFilter" aria-label="Filter by state">
+            <option value="">All States</option>
+            <option value="Selangor">Selangor</option>
+            <option value="Penang">Penang</option>
+            <option value="Sabah">Sabah</option>
+            <option value="Sarawak">Sarawak</option>
+            <option value="Johor">Johor</option>
+            <option value="Perak">Perak</option>
+            <option value="Kedah">Kedah</option>
+            <option value="Kelantan">Kelantan</option>
+            <option value="Terengganu">Terengganu</option>
+            <option value="Pahang">Pahang</option>
+            <option value="Negeri Sembilan">Negeri Sembilan</option>
+            <option value="Melaka">Melaka</option>
+            <option value="Perlis">Perlis</option>
+        </select>
+    </div>
+    
+    <!-- River Filter -->
+    <div class="filter-group">
+        <label class="form-label">River</label>
+        <select class="form-select" id="riverFilter" aria-label="Filter by river">
+            <option value="">All Rivers</option>
+            <option value="Sungai Klang">Sungai Klang</option>
+            <option value="Sungai Pinang">Sungai Pinang</option>
+            <option value="Sungai Petagas">Sungai Petagas</option>
+            <option value="Sungai Johor">Sungai Johor</option>
+            <option value="Sungai Linggi">Sungai Linggi</option>
+            <option value="Sungai Muar">Sungai Muar</option>
+            <option value="Sungai Pahang">Sungai Pahang</option>
+            <option value="Sungai Perak">Sungai Perak</option>
+            <option value="Sungai Muda">Sungai Muda</option>
+            <option value="Sungai Kelantan">Sungai Kelantan</option>
+            <option value="Sungai Terengganu">Sungai Terengganu</option>
+        </select>
+    </div>
+    
+    <!-- Pollution Type Filter -->
+    <div class="filter-group">
+        <label class="form-label">Pollution Type</label>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="Plastic Bottles" id="plasticBottles" checked>
+            <label class="form-check-label" for="plasticBottles">
+                Plastic Bottles
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="Plastic Bags" id="plasticBags" checked>
+            <label class="form-check-label" for="plasticBags">
+                Plastic Bags
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="Food Wrappers" id="foodWrappers" checked>
+            <label class="form-check-label" for="foodWrappers">
+                Food Wrappers
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="Straws" id="straws" checked>
+            <label class="form-check-label" for="straws">
+                Straws
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="Cigarette Butts" id="cigaretteButts" checked>
+            <label class="form-check-label" for="cigaretteButts">
+                Cigarette Butts
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="Fishing Gear" id="fishingGear" checked>
+            <label class="form-check-label" for="fishingGear">
+                Fishing Gear
+            </label>
+        </div>
+    </div>
+    
+    <!-- Apply Filters Button -->
+    <div class="filter-group">
+        <button class="btn btn-primary w-100 btn-apply-filters" id="applyFiltersBtn" onclick="applyFilters()">
+            <i class="fas fa-filter me-2"></i>
+            Apply Filters
+        </button>
+    </div>
+    
+    <!-- Clear Filters Button -->
+    <div class="filter-group">
+        <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+            <i class="fas fa-times me-2"></i>
+            Clear Filters
+        </button>
+    </div>
+    
+    <hr class="my-4">
+    
+    <!-- Quick Stats -->
+    <h6 class="mb-3">
+        <i class="fas fa-chart-pie me-2"></i>
+        Quick Stats
+    </h6>
+    
+    <div class="stats-card">
+        <div class="stats-number" id="totalReports">0</div>
+        <div class="stats-label">Total Reports</div>
+    </div>
+    
+    <div class="stats-card">
+        <div class="stats-number" id="avgRiskScore">0.0</div>
+        <div class="stats-label">Avg Risk Score</div>
+    </div>
+    
+    <div class="stats-card">
+        <div class="stats-number" id="highRiskZones">0</div>
+        <div class="stats-label">High Risk Zones</div>
+    </div>
+</div> 

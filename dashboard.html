@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - DebriSense</title>
+    <meta name="description" content="Interactive marine debris risk heatmap for Malaysia">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Custom CSS -->
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Navigation Placeholder -->
+        <div id="navbar-placeholder"></div>
+        
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Sidebar -->
+                    <div class="col-md-3">
+                        <div id="sidebar-placeholder"></div>
+                    </div>
+                    
+                    <!-- Main Content Area -->
+                    <div class="col-md-9">
+                        <!-- Page Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h1 class="mb-1">
+                                    <i class="fas fa-map me-2"></i>
+                                    Marine Debris Risk Dashboard
+                                </h1>
+                                <p class="text-muted mb-0">
+                                    Interactive heatmap showing predicted plastic pollution risk zones across Malaysia
+                                </p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary" onclick="exportMapData()">
+                                    <i class="fas fa-download me-2"></i>
+                                    Export Data
+                                </button>
+                                <button class="btn btn-primary" onclick="showMapLegend()">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Legend
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Map Container -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-layer-group me-2"></i>
+                                    Risk Zone Heatmap
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="map" class="map-container">
+                                    <div class="map-placeholder">
+                                        <div class="text-center">
+                                            <i class="fas fa-map-marked-alt fa-3x mb-3"></i>
+                                            <p>Loading interactive heatmap...</p>
+                                            <small class="text-muted">Click on regions to view detailed risk information</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Risk Legend -->
+                        <div class="row mt-4">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-chart-pie me-2"></i>
+                                            Risk Score Legend
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <div class="risk-score risk-low me-2">Low</div>
+                                                    <span>0.0 - 0.3</span>
+                                                </div>
+                                                <small class="text-muted">Minimal pollution risk</small>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <div class="risk-score risk-moderate me-2">Moderate</div>
+                                                    <span>0.31 - 0.6</span>
+                                                </div>
+                                                <small class="text-muted">Medium pollution risk</small>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <div class="risk-score risk-high me-2">High</div>
+                                                    <span>0.61 - 1.0</span>
+                                                </div>
+                                                <small class="text-muted">High pollution risk</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-clock me-2"></i>
+                                            Last Updated
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-1">
+                                            <strong>Predictions:</strong> 
+                                            <span id="lastUpdated">2024-10-15 10:30 AM</span>
+                                        </p>
+                                        <p class="mb-1">
+                                            <strong>Season:</strong> 
+                                            <span id="currentSeason">Northeast Monsoon</span>
+                                        </p>
+                                        <p class="mb-0">
+                                            <strong>Data Points:</strong> 
+                                            <span id="dataPoints">5 zones</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Activity -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-history me-2"></i>
+                                            Recent Cleanup Activity
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Location</th>
+                                                        <th>State</th>
+                                                        <th>River</th>
+                                                        <th>Items Collected</th>
+                                                        <th>Team</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="recentActivityTable">
+                                                    <!-- TODO: Populate with recent cleanup reports -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer Placeholder -->
+        <div id="footer-placeholder"></div>
+    </div>
+    
+    <!-- Region Details Modal -->
+    <div class="modal fade" id="regionDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        Region Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close modal"></button>
+                </div>
+                <div class="modal-body" id="regionDetailsContent">
+                    <!-- Content will be populated dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="viewRegionInsights()">
+                        <i class="fas fa-chart-line me-2"></i>
+                        View Insights
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet.js -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="data/mock-data.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html> 

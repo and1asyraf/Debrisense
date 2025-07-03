@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Insights - DebriSense</title>
+    <meta name="description" content="Machine learning insights and risk predictions for marine debris">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Navigation Placeholder -->
+        <div id="navbar-placeholder"></div>
+        
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Sidebar -->
+                    <div class="col-md-3">
+                        <div id="sidebar-placeholder"></div>
+                    </div>
+                    
+                    <!-- Main Content Area -->
+                    <div class="col-md-9">
+                        <!-- Page Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h1 class="mb-1">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    ML Risk Insights
+                                </h1>
+                                <p class="text-muted mb-0">
+                                    Machine learning predictions and risk analysis for marine debris hotspots
+                                </p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary" onclick="exportInsights()">
+                                    <i class="fas fa-download me-2"></i>
+                                    Export Insights
+                                </button>
+                                <button class="btn btn-primary" onclick="refreshPredictions()">
+                                    <i class="fas fa-sync me-2"></i>
+                                    Refresh Data
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Season Toggle -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <h5 class="mb-2">
+                                            <i class="fas fa-calendar-alt me-2"></i>
+                                            Season Analysis
+                                        </h5>
+                                        <p class="text-muted mb-0">
+                                            Compare risk predictions between monsoon seasons
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="btn-group w-100" role="group">
+                                            <input type="radio" class="btn-check" name="seasonToggle" id="northeastToggle" value="Northeast Monsoon" checked>
+                                            <label class="btn btn-outline-primary" for="northeastToggle">
+                                                <i class="fas fa-cloud-rain me-2"></i>
+                                                Northeast Monsoon
+                                            </label>
+                                            
+                                            <input type="radio" class="btn-check" name="seasonToggle" id="southwestToggle" value="Southwest Monsoon">
+                                            <label class="btn btn-outline-primary" for="southwestToggle">
+                                                <i class="fas fa-sun me-2"></i>
+                                                Southwest Monsoon
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Risk Trend Chart -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="chart-container">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-chart-area me-2"></i>
+                                            Risk Score Trends
+                                        </h5>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-secondary" onclick="updateChartPeriod('3m')">3M</button>
+                                            <button class="btn btn-outline-secondary active" onclick="updateChartPeriod('6m')">6M</button>
+                                            <button class="btn btn-outline-secondary" onclick="updateChartPeriod('1y')">1Y</button>
+                                        </div>
+                                    </div>
+                                    <canvas id="riskTrendChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Top Risk Zones and Pollution Types -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Top 5 Risk Zones
+                                    </h5>
+                                    <canvas id="topRiskZonesChart" height="200"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-trash me-2"></i>
+                                        Pollution Type Distribution
+                                    </h5>
+                                    <canvas id="pollutionTypesChart" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Risk Insights Cards -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    Risk Insights & Recommendations
+                                </h5>
+                            </div>
+                        </div>
+                        
+                        <div class="row" id="insightsCards">
+                            <!-- Cards will be populated dynamically -->
+                        </div>
+                        
+                        <!-- Regional Comparison -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="chart-container">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-balance-scale me-2"></i>
+                                        Regional Risk Comparison
+                                    </h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Region</th>
+                                                    <th>State</th>
+                                                    <th>River Basin</th>
+                                                    <th>Risk Score</th>
+                                                    <th>Trend</th>
+                                                    <th>Top Pollution</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="regionalComparisonTable">
+                                                <!-- Table will be populated dynamically -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Model Performance -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-cogs me-2"></i>
+                                            Model Performance & Accuracy
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3 text-center">
+                                                <div class="stats-card">
+                                                    <div class="stats-number">87.3%</div>
+                                                    <div class="stats-label">Prediction Accuracy</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 text-center">
+                                                <div class="stats-card">
+                                                    <div class="stats-number">0.89</div>
+                                                    <div class="stats-label">R² Score</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 text-center">
+                                                <div class="stats-card">
+                                                    <div class="stats-number">0.023</div>
+                                                    <div class="stats-label">Mean Error</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 text-center">
+                                                <div class="stats-card">
+                                                    <div class="stats-number">5</div>
+                                                    <div class="stats-label">Features Used</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>Model Features:</h6>
+                                                <ul class="list-unstyled">
+                                                    <li><i class="fas fa-check text-success me-2"></i>Historical cleanup density</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>River flow accumulation</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>Population density</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>Seasonal patterns</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>Terrain slope data</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>Last Model Update:</h6>
+                                                <p class="text-muted">2024-10-15 10:30 AM</p>
+                                                <h6>Training Data:</h6>
+                                                <p class="text-muted">2,847 cleanup reports, 156 river segments</p>
+                                                <h6>Next Update:</h6>
+                                                <p class="text-muted">Scheduled for 2024-11-15</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer Placeholder -->
+        <div id="footer-placeholder"></div>
+    </div>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="data/mock-data.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/insights.js"></script>
+</body>
+</html> 
