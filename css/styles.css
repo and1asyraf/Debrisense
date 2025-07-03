@@ -478,3 +478,72 @@ h6 { font-size: 12px; }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
 }
+
+/* Custom Map Markers */
+.custom-marker {
+    background: transparent;
+    border: none;
+}
+
+.marker-pin {
+    width: 30px;
+    height: 30px;
+    border-radius: 50% 50% 50% 0;
+    background: var(--primary-green);
+    position: relative;
+    transform: rotate(-45deg);
+    margin: -15px -15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.marker-pin:hover {
+    transform: rotate(-45deg) scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.marker-pin i {
+    color: white;
+    font-size: 14px;
+    transform: rotate(45deg);
+}
+
+.marker-pin.risk-low {
+    background: var(--risk-low);
+    border: 2px solid #2e7d32;
+}
+
+.marker-pin.risk-moderate {
+    background: var(--risk-moderate);
+    border: 2px solid #f57f17;
+}
+
+.marker-pin.risk-high {
+    background: var(--risk-high);
+    border: 2px solid #d32f2f;
+}
+
+/* Custom Tooltips */
+.custom-tooltip {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-medium);
+    padding: 8px;
+    font-size: 12px;
+    max-width: 200px;
+}
+
+.marker-tooltip {
+    text-align: center;
+}
+
+.marker-tooltip .risk-score {
+    font-size: 11px;
+    padding: 2px 6px;
+    margin: 2px 0;
+}

@@ -72,41 +72,54 @@ function createRiskZones() {
     });
 }
 
-// Create a single zone layer
+// Create a single zone marker
 function createZoneLayer(zone) {
-    // Create a simple polygon for the zone (placeholder coordinates)
+    // Get coordinates for the zone
     const coordinates = getZoneCoordinates(zone);
     if (!coordinates) return null;
     
-    // Determine color based on risk score
-    const color = getRiskColor(zone.predicted_risk_score);
+    // Calculate center point for marker
+    const centerLat = (coordinates[0][0] + coordinates[1][0]) / 2;
+    const centerLng = (coordinates[0][1] + coordinates[1][1]) / 2;
     
-    // Create polygon
-    const polygon = L.polygon(coordinates, {
-        color: color,
-        weight: 2,
-        opacity: 0.8,
-        fillColor: color,
-        fillOpacity: 0.4
+    // Determine color and icon based on risk score
+    const riskColor = getRiskColor(zone.predicted_risk_score);
+    const riskClass = getRiskClass(zone.predicted_risk_score);
+    
+    // Create custom icon
+    const icon = L.divIcon({
+        className: 'custom-marker',
+        html: `<div class="marker-pin ${riskClass}" style="background-color: ${riskColor};">
+                <i class="fas fa-map-marker-alt"></i>
+               </div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
     });
     
+    // Create marker
+    const marker = L.marker([centerLat, centerLng], { icon: icon });
+    
     // Add popup on click
-    polygon.on('click', function() {
+    marker.on('click', function() {
         showRegionDetails(zone);
     });
     
     // Add tooltip on hover
-    polygon.bindTooltip(`
-        <strong>${zone.river_basin}</strong><br>
-        Risk Score: ${(zone.predicted_risk_score * 100).toFixed(1)}%<br>
-        State: ${zone.state}<br>
-        Click for details
+    marker.bindTooltip(`
+        <div class="marker-tooltip">
+            <strong>${zone.river_basin}</strong><br>
+            <span class="risk-score ${riskClass}">${(zone.predicted_risk_score * 100).toFixed(1)}% Risk</span><br>
+            <small>State: ${zone.state}</small><br>
+            <small>Click for detailed insights</small>
+        </div>
     `, {
         permanent: false,
-        direction: 'top'
+        direction: 'top',
+        className: 'custom-tooltip'
     });
     
-    return polygon;
+    return marker;
 }
 
 // Get coordinates for a zone (placeholder implementation)
