@@ -203,7 +203,7 @@ frontend/
 
 ## 📄 License
 
-This project is developed for Challenge 2: Marine Pollution Detection & Response Using Big Data.
+This project is developed for MarineHack 2025 by PINC.my
 
 ## 🌟 Acknowledgments
 
