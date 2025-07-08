@@ -3,23 +3,35 @@
 
 let map;
 let mapLayers = {};
+let heatmapLayer = null;
 let selectedRegion = null;
 
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Dashboard initialized');
+    console.log('🚀 Dashboard initialized');
+    
+    // Check for required dependencies
+    console.log('📦 Checking dependencies...');
+    console.log('Leaflet available:', typeof L !== 'undefined');
+    console.log('Heatmap plugin available:', typeof L.heatLayer !== 'undefined');
+    console.log('Mock data available:', typeof mockData !== 'undefined');
     
     // Initialize map after components are loaded
     setTimeout(() => {
-        initializeMap();
-        populateRecentActivity();
-        updateDashboardStats();
+        try {
+            initializeMap();
+            populateRecentActivity();
+            updateDashboardStats();
+            console.log('✅ Dashboard setup complete');
+        } catch (error) {
+            console.error('❌ Dashboard initialization failed:', error);
+        }
     }, 1000);
 });
 
-// Initialize the interactive map
+// Initialize the interactive map with heatmap
 function initializeMap() {
-    console.log('Initializing map...');
+    console.log('Initializing map with heatmap...');
     
     // Create map centered on Malaysia
     map = L.map('map').setView([4.2105, 108.9758], 6);
@@ -45,81 +57,153 @@ function initializeMap() {
         }).addTo(map);
     });
     
-    // Create risk zones from mock data
-    createRiskZones();
+    // Create heatmap overlay
+    createHeatmapOverlay();
+    
+    // Create risk zone polygons
+    createRiskZonePolygons();
+    
+    // Create clickable pins
+    createRiskPins();
     
     // Add map controls
     addMapControls();
     
-    console.log('Map initialized successfully');
+    console.log('Map with heatmap initialized successfully');
 }
 
-// Create risk zones on the map
-function createRiskZones() {
-    // Clear existing layers
-    Object.values(mapLayers).forEach(layer => {
-        if (layer) map.removeLayer(layer);
-    });
-    mapLayers = {};
+// Create heatmap overlay from ML prediction data
+function createHeatmapOverlay() {
+    // Convert ML prediction zones to heatmap data points
+    const heatmapData = mockData.mlPredictionZones.map(zone => {
+        const coordinates = getZoneCoordinates(zone);
+        if (!coordinates) return null;
+        
+        // Calculate center point
+        const centerLat = (coordinates[0][0] + coordinates[1][0]) / 2;
+        const centerLng = (coordinates[0][1] + coordinates[1][1]) / 2;
+        
+        return {
+            lat: centerLat,
+            lng: centerLng,
+            intensity: zone.predicted_risk_score // Use risk score as intensity
+        };
+    }).filter(point => point !== null);
     
-    // Create zones for each ML prediction
-    mockData.mlPredictionZones.forEach(zone => {
-        const zoneLayer = createZoneLayer(zone);
-        if (zoneLayer) {
-            mapLayers[zone.id] = zoneLayer;
-            zoneLayer.addTo(map);
+    // Create heatmap layer
+    heatmapLayer = L.heatLayer(heatmapData, {
+        radius: 50,
+        blur: 30,
+        maxZoom: 10,
+        gradient: {
+            0.0: '#A5D6A7', // Green for low risk
+            0.3: '#A5D6A7',
+            0.31: '#FFF176', // Yellow for moderate risk
+            0.6: '#FFF176',
+            0.61: '#EF5350', // Red for high risk
+            1.0: '#EF5350'
         }
+    }).addTo(map);
+    
+    mapLayers.heatmap = heatmapLayer;
+}
+
+// Create risk zone polygons
+function createRiskZonePolygons() {
+    mockData.mlPredictionZones.forEach(zone => {
+        const coordinates = getZoneCoordinates(zone);
+        if (!coordinates) return;
+        
+        // Create polygon bounds
+        const bounds = [
+            [coordinates[0][0], coordinates[0][1]],
+            [coordinates[1][0], coordinates[1][1]]
+        ];
+        
+        // Create rectangle polygon
+        const polygon = L.rectangle(bounds, {
+            color: getRiskColor(zone.predicted_risk_score),
+            weight: 2,
+            fillColor: getRiskColor(zone.predicted_risk_score),
+            fillOpacity: 0.3
+        });
+        
+        // Add click handler
+        polygon.on('click', function() {
+            showRegionDetails(zone);
+        });
+        
+        // Add tooltip
+        polygon.bindTooltip(`
+            <div class="zone-tooltip">
+                <strong>${zone.river_basin}</strong><br>
+                <span class="risk-score ${getRiskClass(zone.predicted_risk_score)}">
+                    ${(zone.predicted_risk_score * 100).toFixed(1)}% Risk
+                </span><br>
+                <small>State: ${zone.state}</small><br>
+                <small>Click for detailed insights</small>
+            </div>
+        `, {
+            permanent: false,
+            direction: 'top',
+            className: 'zone-tooltip'
+        });
+        
+        mapLayers[`zone_${zone.id}`] = polygon;
+        polygon.addTo(map);
     });
 }
 
-// Create a single zone marker
-function createZoneLayer(zone) {
-    // Get coordinates for the zone
-    const coordinates = getZoneCoordinates(zone);
-    if (!coordinates) return null;
-    
-    // Calculate center point for marker
-    const centerLat = (coordinates[0][0] + coordinates[1][0]) / 2;
-    const centerLng = (coordinates[0][1] + coordinates[1][1]) / 2;
-    
-    // Determine color and icon based on risk score
-    const riskColor = getRiskColor(zone.predicted_risk_score);
-    const riskClass = getRiskClass(zone.predicted_risk_score);
-    
-    // Create custom icon
-    const icon = L.divIcon({
-        className: 'custom-marker',
-        html: `<div class="marker-pin ${riskClass}" style="background-color: ${riskColor};">
-                <i class="fas fa-map-marker-alt"></i>
-               </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+// Create clickable risk pins
+function createRiskPins() {
+    mockData.mlPredictionZones.forEach(zone => {
+        const coordinates = getZoneCoordinates(zone);
+        if (!coordinates) return;
+        
+        // Calculate center point for marker
+        const centerLat = (coordinates[0][0] + coordinates[1][0]) / 2;
+        const centerLng = (coordinates[0][1] + coordinates[1][1]) / 2;
+        
+        // Determine color and icon based on risk score
+        const riskColor = getRiskColor(zone.predicted_risk_score);
+        const riskClass = getRiskClass(zone.predicted_risk_score);
+        
+        // Create custom icon
+        const icon = L.divIcon({
+            className: 'custom-marker',
+            html: `<div class="marker-pin ${riskClass}" style="background-color: ${riskColor};">
+                    <i class="fas fa-map-marker-alt"></i>
+                   </div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+        
+        // Create marker
+        const marker = L.marker([centerLat, centerLng], { icon: icon });
+        
+        // Add popup on click
+        marker.on('click', function() {
+            showRegionDetails(zone);
+        });
+        
+        // Add tooltip on hover
+        marker.bindTooltip(`
+            <div class="marker-tooltip">
+                <strong>${zone.river_basin}</strong><br>
+                <span class="risk-score ${riskClass}">${(zone.predicted_risk_score * 100).toFixed(1)}% Risk</span><br>
+                <small>State: ${zone.state}</small><br>
+                <small>Click for detailed insights</small>
+            </div>
+        `, {
+            permanent: false,
+            direction: 'top',
+            className: 'custom-tooltip'
+        });
+        
+        mapLayers[`pin_${zone.id}`] = marker;
+        marker.addTo(map);
     });
-    
-    // Create marker
-    const marker = L.marker([centerLat, centerLng], { icon: icon });
-    
-    // Add popup on click
-    marker.on('click', function() {
-        showRegionDetails(zone);
-    });
-    
-    // Add tooltip on hover
-    marker.bindTooltip(`
-        <div class="marker-tooltip">
-            <strong>${zone.river_basin}</strong><br>
-            <span class="risk-score ${riskClass}">${(zone.predicted_risk_score * 100).toFixed(1)}% Risk</span><br>
-            <small>State: ${zone.state}</small><br>
-            <small>Click for detailed insights</small>
-        </div>
-    `, {
-        permanent: false,
-        direction: 'top',
-        className: 'custom-tooltip'
-    });
-    
-    return marker;
 }
 
 // Get coordinates for a zone (placeholder implementation)
@@ -304,16 +388,36 @@ function showMapLegend() {
     const legendContent = `
         <div class="row">
             <div class="col-md-4 text-center">
-                <div class="risk-score risk-low mb-2">Low Risk</div>
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="risk-zone risk-low me-2"></div>
+                    <span>Low Risk</span>
+                </div>
                 <small>0.0 - 0.3</small>
             </div>
             <div class="col-md-4 text-center">
-                <div class="risk-score risk-moderate mb-2">Moderate Risk</div>
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="risk-zone risk-moderate me-2"></div>
+                    <span>Moderate Risk</span>
+                </div>
                 <small>0.31 - 0.6</small>
             </div>
             <div class="col-md-4 text-center">
-                <div class="risk-score risk-high mb-2">High Risk</div>
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="risk-zone risk-high me-2"></div>
+                    <span>High Risk</span>
+                </div>
                 <small>0.61 - 1.0</small>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <h6><i class="fas fa-fire me-2"></i>Heatmap Overlay</h6>
+                <p class="small text-muted">Colored zones show pollution risk intensity across Malaysia</p>
+            </div>
+            <div class="col-md-6">
+                <h6><i class="fas fa-map-marker-alt me-2"></i>Location Pins</h6>
+                <p class="small text-muted">Clickable pins for detailed region insights</p>
             </div>
         </div>
         <hr>
@@ -325,9 +429,9 @@ function showMapLegend() {
     
     const alertDiv = document.createElement('div');
     alertDiv.className = 'alert alert-info alert-dismissible fade show position-fixed';
-    alertDiv.style.cssText = 'top: 20px; left: 20px; z-index: 9999; max-width: 400px;';
+    alertDiv.style.cssText = 'top: 20px; left: 20px; z-index: 9999; max-width: 500px;';
     alertDiv.innerHTML = `
-        <h6><i class="fas fa-info-circle me-2"></i>Map Legend</h6>
+        <h6><i class="fas fa-fire me-2"></i>Heatmap Legend</h6>
         ${legendContent}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
@@ -338,7 +442,7 @@ function showMapLegend() {
         if (alertDiv.parentNode) {
             alertDiv.parentNode.removeChild(alertDiv);
         }
-    }, 8000);
+    }, 10000);
 }
 
 // Populate recent activity table

@@ -547,3 +547,32 @@ h6 { font-size: 12px; }
     padding: 2px 6px;
     margin: 2px 0;
 }
+
+/* Marker pin rotation styles for legend */
+.marker-pin-rotated {
+    transform: rotate(-45deg);
+}
+
+.marker-pin-rotated i {
+    transform: rotate(45deg);
+}
+
+/* Risk zone legend styles */
+.risk-zone {
+    width: 30px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid rgba(0,0,0,0.2);
+}
+
+.risk-zone.risk-low {
+    background-color: #A5D6A7;
+}
+
+.risk-zone.risk-moderate {
+    background-color: #FFF176;
+}
+
+.risk-zone.risk-high {
+    background-color: #EF5350;
+}

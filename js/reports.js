@@ -26,6 +26,15 @@ function initializeReports() {
     populateReportsTable();
     updateSummaryStats();
     
+    // Test jsPDF availability
+    setTimeout(() => {
+        if (typeof window.jspdf !== 'undefined') {
+            console.log('jsPDF library loaded successfully');
+        } else {
+            console.warn('jsPDF library not available - PDF export will fall back to CSV');
+        }
+    }, 2000);
+    
     console.log('Reports initialized successfully');
 }
 
@@ -448,12 +457,83 @@ function viewReportDetails(reportId) {
     
     document.getElementById('reportDetailsContent').innerHTML = modalContent;
     
+    // Store the current report ID for export
+    window.currentReportId = reportId;
+    
     const modal = new bootstrap.Modal(document.getElementById('reportDetailsModal'));
     modal.show();
 }
 
 // Export single report
 function exportSingleReport(reportId) {
+    const report = mockData.cleanupReports.find(r => r.id === reportId);
+    if (!report) return;
+    
+    try {
+        // Check if jsPDF is available
+        if (typeof window.jspdf === 'undefined') {
+            console.warn('jsPDF not available, falling back to CSV export');
+            exportSingleReportCSV(reportId);
+            return;
+        }
+        
+        // Create PDF document
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Add title
+        doc.setFontSize(20);
+        doc.text('Cleanup Report', 20, 20);
+        
+        // Add report details
+        doc.setFontSize(12);
+        doc.text(`Report ID: ${report.id}`, 20, 40);
+        doc.text(`Location: ${report.location}`, 20, 50);
+        doc.text(`Date: ${new Date(report.date).toLocaleDateString()}`, 20, 60);
+        doc.text(`State: ${report.state}`, 20, 70);
+        doc.text(`River: ${report.river}`, 20, 80);
+        doc.text(`Submitted by: ${report.submitted_by}`, 20, 90);
+        doc.text(`Source: ${report.source}`, 20, 100);
+        
+        // Add items collected table
+        doc.text('Items Collected:', 20, 120);
+        
+        const tableData = [
+            ['Item Type', 'Quantity'],
+            ['Plastic Bottles', report.plastic_items.plastic_bottles.toString()],
+            ['Plastic Bags', report.plastic_items.plastic_bags.toString()],
+            ['Straws', report.plastic_items.straws.toString()],
+            ['Food Wrappers', report.plastic_items.food_wrappers.toString()],
+            ['Cigarette Butts', report.plastic_items.cigarette_butts.toString()],
+            ['Others', report.plastic_items.others.toString()],
+            ['TOTAL', getTotalItems(report.plastic_items).toString()]
+        ];
+        
+        doc.autoTable({
+            startY: 130,
+            head: [['Item Type', 'Quantity']],
+            body: tableData.slice(1),
+            theme: 'grid',
+            headStyles: { fillColor: [46, 125, 50] }
+        });
+        
+        // Add footer
+        doc.setFontSize(10);
+        doc.text(`Generated on ${new Date().toLocaleDateString()} by DebriSense`, 20, doc.internal.pageSize.height - 20);
+        
+        // Save PDF
+        doc.save(`cleanup_report_${reportId}.pdf`);
+        
+        DebriSense.showNotification('Report exported as PDF successfully', 'success');
+    } catch (error) {
+        console.error('PDF generation failed:', error);
+        console.log('Falling back to CSV export');
+        exportSingleReportCSV(reportId);
+    }
+}
+
+// Fallback CSV export for single report
+function exportSingleReportCSV(reportId) {
     const report = mockData.cleanupReports.find(r => r.id === reportId);
     if (!report) return;
     
@@ -470,11 +550,89 @@ ${report.id},${report.location},${report.date},${report.state},${report.river},$
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    DebriSense.showNotification('Report exported successfully', 'success');
+    DebriSense.showNotification('Report exported as CSV successfully', 'success');
 }
 
 // Export all reports
 function exportReports() {
+    try {
+        // Check if jsPDF is available
+        if (typeof window.jspdf === 'undefined') {
+            console.warn('jsPDF not available, falling back to CSV export');
+            exportReportsCSV();
+            return;
+        }
+        
+        // Create PDF document
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Add title
+        doc.setFontSize(20);
+        doc.text('Cleanup Reports Summary', 20, 20);
+        
+        // Add summary info
+        doc.setFontSize(12);
+        doc.text(`Total Reports: ${currentReports.length}`, 20, 40);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 50);
+        
+        // Prepare table data
+        const tableData = currentReports.map(report => [
+            report.id,
+            report.location,
+            new Date(report.date).toLocaleDateString(),
+            report.state,
+            report.river,
+            getTotalItems(report.plastic_items).toString(),
+            report.submitted_by
+        ]);
+        
+        // Add table
+        doc.autoTable({
+            startY: 70,
+            head: [['Report ID', 'Location', 'Date', 'State', 'River', 'Total Items', 'Submitted By']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: { fillColor: [46, 125, 50] },
+            styles: { fontSize: 8 },
+            columnStyles: {
+                0: { cellWidth: 25 },
+                1: { cellWidth: 35 },
+                2: { cellWidth: 20 },
+                3: { cellWidth: 25 },
+                4: { cellWidth: 30 },
+                5: { cellWidth: 20 },
+                6: { cellWidth: 35 }
+            }
+        });
+        
+        // Add summary statistics
+        const totalItems = currentReports.reduce((sum, report) => sum + getTotalItems(report.plastic_items), 0);
+        const states = [...new Set(currentReports.map(r => r.state))];
+        
+        doc.setFontSize(12);
+        doc.text('Summary Statistics:', 20, doc.lastAutoTable.finalY + 20);
+        doc.setFontSize(10);
+        doc.text(`Total Items Collected: ${totalItems}`, 20, doc.lastAutoTable.finalY + 30);
+        doc.text(`States Covered: ${states.join(', ')}`, 20, doc.lastAutoTable.finalY + 40);
+        
+        // Add footer
+        doc.setFontSize(10);
+        doc.text(`Generated on ${new Date().toLocaleDateString()} by DebriSense`, 20, doc.internal.pageSize.height - 20);
+        
+        // Save PDF
+        doc.save(`cleanup_reports_${new Date().toISOString().split('T')[0]}.pdf`);
+        
+        DebriSense.showNotification('Reports exported as PDF successfully', 'success');
+    } catch (error) {
+        console.error('PDF generation failed:', error);
+        console.log('Falling back to CSV export');
+        exportReportsCSV();
+    }
+}
+
+// Fallback CSV export for all reports
+function exportReportsCSV() {
     const csvHeaders = 'Report ID,Location,Date,State,River,Plastic Bottles,Plastic Bags,Straws,Food Wrappers,Cigarette Butts,Others,Total Items,Submitted By,Source\n';
     const csvContent = currentReports.map(report => 
         `${report.id},${report.location},${report.date},${report.state},${report.river},${report.plastic_items.plastic_bottles},${report.plastic_items.plastic_bags},${report.plastic_items.straws},${report.plastic_items.food_wrappers},${report.plastic_items.cigarette_butts},${report.plastic_items.others},${getTotalItems(report.plastic_items)},${report.submitted_by},${report.source}`
@@ -490,7 +648,7 @@ function exportReports() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    DebriSense.showNotification('Reports exported successfully', 'success');
+    DebriSense.showNotification('Reports exported as CSV successfully', 'success');
 }
 
 // Update charts with new data
@@ -551,4 +709,29 @@ window.reportsFunctions = {
     showAddReportModal,
     submitReport,
     updateReportsWithFilters
+};
+
+// Debug function to test export
+window.testExport = function() {
+    console.log('Testing export functionality...');
+    console.log('jsPDF available:', typeof window.jspdf !== 'undefined');
+    console.log('Current reports:', currentReports.length);
+    console.log('Mock data available:', typeof mockData !== 'undefined');
+    
+    if (currentReports.length > 0) {
+        console.log('First report:', currentReports[0]);
+        exportSingleReport(currentReports[0].id);
+    } else {
+        console.log('No reports available to test');
+    }
+};
+
+// Export current report from modal
+window.exportCurrentReport = function() {
+    if (window.currentReportId) {
+        exportSingleReport(window.currentReportId);
+    } else {
+        console.error('No report ID available for export');
+        DebriSense.showNotification('No report selected for export', 'error');
+    }
 }; 

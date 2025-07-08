@@ -14,6 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet Heatmap Plugin -->
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <!-- Custom CSS -->
     <link href="css/styles.css" rel="stylesheet">
 </head>
@@ -37,11 +39,11 @@
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div>
                                 <h1 class="mb-1">
-                                    <i class="fas fa-map-marker-alt me-2"></i>
-                                    River Pollution Risk Map
+                                    <i class="fas fa-fire me-2"></i>
+                                    Marine Debris Risk Heatmap
                                 </h1>
                                 <p class="text-muted mb-0">
-                                    Click on river pins to view detailed pollution insights and cleanup recommendations
+                                    Interactive heatmap showing pollution risk zones across Malaysia. Click on zones or pins for detailed insights.
                                 </p>
                             </div>
                             <div class="d-flex gap-2">
@@ -60,17 +62,17 @@
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="mb-0">
-                                    <i class="fas fa-map-marker-alt me-2"></i>
-                                    River Risk Pins
+                                    <i class="fas fa-fire me-2"></i>
+                                    Risk Zone Heatmap
                                 </h5>
                             </div>
                             <div class="card-body p-0">
                                 <div id="map" class="map-container">
                                     <div class="map-placeholder">
                                         <div class="text-center">
-                                            <i class="fas fa-map-marker-alt fa-3x mb-3"></i>
-                                            <p>Loading river risk pins...</p>
-                                            <small class="text-muted">Click on any pin to view detailed river insights</small>
+                                            <i class="fas fa-fire fa-3x mb-3"></i>
+                                            <p>Loading risk heatmap...</p>
+                                            <small class="text-muted">Click on zones or pins to view detailed insights</small>
                                         </div>
                                     </div>
                                 </div>
@@ -83,35 +85,29 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <h5 class="mb-0">
-                                            <i class="fas fa-map-marker-alt me-2"></i>
-                                            River Risk Pins Legend
+                                            <i class="fas fa-fire me-2"></i>
+                                            Risk Zone Heatmap Legend
                                         </h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div class="d-flex align-items-center mb-2">
-                                                    <div class="marker-pin risk-low me-2" style="transform: rotate(-45deg);">
-                                                        <i class="fas fa-map-marker-alt" style="transform: rotate(45deg);"></i>
-                                                    </div>
+                                                    <div class="risk-zone risk-low me-2"></div>
                                                     <span>Low Risk (0.0 - 0.3)</span>
                                                 </div>
                                                 <small class="text-muted">Minimal pollution risk</small>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="d-flex align-items-center mb-2">
-                                                    <div class="marker-pin risk-moderate me-2" style="transform: rotate(-45deg);">
-                                                        <i class="fas fa-map-marker-alt" style="transform: rotate(45deg);"></i>
-                                                    </div>
+                                                    <div class="risk-zone risk-moderate me-2"></div>
                                                     <span>Moderate Risk (0.31 - 0.6)</span>
                                                 </div>
                                                 <small class="text-muted">Medium pollution risk</small>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="d-flex align-items-center mb-2">
-                                                    <div class="marker-pin risk-high me-2" style="transform: rotate(-45deg);">
-                                                        <i class="fas fa-map-marker-alt" style="transform: rotate(45deg);"></i>
-                                                    </div>
+                                                    <div class="risk-zone risk-high me-2"></div>
                                                     <span>High Risk (0.61 - 1.0)</span>
                                                 </div>
                                                 <small class="text-muted">High pollution risk</small>
@@ -121,7 +117,7 @@
                                         <div class="text-center">
                                             <small class="text-muted">
                                                 <i class="fas fa-info-circle me-1"></i>
-                                                Click on any pin to view detailed river insights and cleanup recommendations
+                                                Click on zones or pins to view detailed insights and cleanup recommendations
                                             </small>
                                         </div>
                                     </div>
