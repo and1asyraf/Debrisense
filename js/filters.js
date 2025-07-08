@@ -536,4 +536,400 @@ ${report.id},${report.location},${report.state},${report.river},${report.date},$
     URL.revokeObjectURL(url);
     
     DebriSense.showNotification('Report exported successfully', 'success');
-} 
+}
+
+// DebriSense Map Filters JavaScript
+// Handles filter functionality for the enhanced dashboard
+
+// Global filter state
+let globalFilters = {
+    state: '',
+    river: '',
+    pollutionTypes: [],
+    dateRange: {
+        start: '2024-07-01',
+        end: '2024-10-15'
+    },
+    riskLevel: 'all' // all, low, moderate, high
+};
+
+// Initialize filter functionality
+function initializeFilters() {
+    console.log('🔧 Initializing map filters...');
+    
+    // Set up filter event listeners
+    setupFilterEventListeners();
+    
+    // Initialize filter state
+    updateFilterState();
+    
+    console.log('✅ Filters initialized');
+}
+
+// Set up filter event listeners
+function setupFilterEventListeners() {
+    // State filter
+    const stateFilter = document.getElementById('stateFilter');
+    if (stateFilter) {
+        stateFilter.addEventListener('change', function() {
+            globalFilters.state = this.value;
+            updateFilterState();
+            console.log('📍 State filter changed to:', this.value);
+        });
+    }
+    
+    // River filter
+    const riverFilter = document.getElementById('riverFilter');
+    if (riverFilter) {
+        riverFilter.addEventListener('change', function() {
+            globalFilters.river = this.value;
+            updateFilterState();
+            console.log('🌊 River filter changed to:', this.value);
+        });
+    }
+    
+    // Pollution type filters
+    const pollutionCheckboxes = [
+        'plasticBottles', 'plasticBags', 'foodWrappers', 
+        'straws', 'fishingGear', 'others'
+    ];
+    
+    pollutionCheckboxes.forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) {
+            checkbox.addEventListener('change', function() {
+                updatePollutionTypeFilters();
+                console.log('🗑️ Pollution type filter updated');
+            });
+        }
+    });
+    
+    // Date range filters
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    
+    if (startDate) {
+        startDate.addEventListener('change', function() {
+            globalFilters.dateRange.start = this.value;
+            updateFilterState();
+            console.log('📅 Start date changed to:', this.value);
+        });
+    }
+    
+    if (endDate) {
+        endDate.addEventListener('change', function() {
+            globalFilters.dateRange.end = this.value;
+            updateFilterState();
+            console.log('📅 End date changed to:', this.value);
+        });
+    }
+}
+
+// Update pollution type filters
+function updatePollutionTypeFilters() {
+    const pollutionTypes = {
+        'plasticBottles': 'Plastic Bottles',
+        'plasticBags': 'Plastic Bags',
+        'foodWrappers': 'Food Wrappers',
+        'straws': 'Straws',
+        'fishingGear': 'Fishing Gear',
+        'others': 'Others'
+    };
+    
+    globalFilters.pollutionTypes = [];
+    
+    Object.keys(pollutionTypes).forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox && checkbox.checked) {
+            globalFilters.pollutionTypes.push(pollutionTypes[id]);
+        }
+    });
+    
+    updateFilterState();
+}
+
+// Update filter state and UI
+function updateFilterState() {
+    // Update filter status display
+    updateFilterStatusDisplay();
+    
+    // Update filter button state
+    updateFilterButtonState();
+    
+    // Log current filter state
+    console.log('🔍 Current filter state:', globalFilters);
+}
+
+// Update filter status display
+function updateFilterStatusDisplay() {
+    const statusElement = document.getElementById('filterStatus');
+    if (!statusElement) return;
+    
+    const activeFilters = [];
+    
+    if (globalFilters.state) {
+        activeFilters.push(globalFilters.state);
+    }
+    
+    if (globalFilters.river) {
+        activeFilters.push(globalFilters.river);
+    }
+    
+    if (globalFilters.pollutionTypes.length > 0 && globalFilters.pollutionTypes.length < 6) {
+        activeFilters.push(`${globalFilters.pollutionTypes.length} pollution types`);
+    }
+    
+    if (activeFilters.length > 0) {
+        statusElement.textContent = `Filtered: ${activeFilters.join(' | ')}`;
+        statusElement.className = 'text-primary fw-bold';
+    } else {
+        statusElement.textContent = 'Showing all data';
+        statusElement.className = 'text-muted';
+    }
+}
+
+// Update filter button state
+function updateFilterButtonState() {
+    const applyButton = document.querySelector('button[onclick="applyMapFilters()"]');
+    if (!applyButton) return;
+    
+    // Check if any filters are active
+    const hasActiveFilters = globalFilters.state || 
+                           globalFilters.river || 
+                           globalFilters.pollutionTypes.length < 6;
+    
+    if (hasActiveFilters) {
+        applyButton.classList.add('btn-warning');
+        applyButton.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Apply Filters';
+    } else {
+        applyButton.classList.remove('btn-warning');
+        applyButton.innerHTML = '<i class="fas fa-filter me-2"></i>Apply Filters';
+    }
+}
+
+// Get filtered data based on current filters
+function getFilteredData(dataArray, filterType = 'zones') {
+    if (!dataArray || !Array.isArray(dataArray)) {
+        console.warn('⚠️ Invalid data array provided for filtering');
+        return [];
+    }
+    
+    return dataArray.filter(item => {
+        // State filter
+        if (globalFilters.state && item.state !== globalFilters.state) {
+            return false;
+        }
+        
+        // River filter
+        if (globalFilters.river) {
+            const riverField = filterType === 'zones' ? 'river_basin' : 'river';
+            if (item[riverField] !== globalFilters.river) {
+                return false;
+            }
+        }
+        
+        // Date range filter (if applicable)
+        if (item.date || item.last_updated) {
+            const itemDate = new Date(item.date || item.last_updated);
+            const startDate = new Date(globalFilters.dateRange.start);
+            const endDate = new Date(globalFilters.dateRange.end);
+            
+            if (itemDate < startDate || itemDate > endDate) {
+                return false;
+            }
+        }
+        
+        // Pollution type filter (for reports and observations)
+        if (filterType === 'reports' && globalFilters.pollutionTypes.length > 0) {
+            const itemTypes = Object.keys(item.plastic_items || {});
+            const hasMatchingType = itemTypes.some(type => 
+                globalFilters.pollutionTypes.includes(type)
+            );
+            if (!hasMatchingType) {
+                return false;
+            }
+        }
+        
+        return true;
+    });
+}
+
+// Clear all filters
+function clearAllFilters() {
+    console.log('🧹 Clearing all filters...');
+    
+    // Reset filter state
+    globalFilters = {
+        state: '',
+        river: '',
+        pollutionTypes: ['Plastic Bottles', 'Plastic Bags', 'Food Wrappers', 'Straws', 'Fishing Gear', 'Others'],
+        dateRange: {
+            start: '2024-07-01',
+            end: '2024-10-15'
+        },
+        riskLevel: 'all'
+    };
+    
+    // Reset UI elements
+    const stateFilter = document.getElementById('stateFilter');
+    if (stateFilter) stateFilter.value = '';
+    
+    const riverFilter = document.getElementById('riverFilter');
+    if (riverFilter) riverFilter.value = '';
+    
+    // Reset checkboxes
+    const pollutionCheckboxes = [
+        'plasticBottles', 'plasticBags', 'foodWrappers', 
+        'straws', 'fishingGear', 'others'
+    ];
+    
+    pollutionCheckboxes.forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) checkbox.checked = true;
+    });
+    
+    // Reset date inputs
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    
+    if (startDate) startDate.value = '2024-07-01';
+    if (endDate) endDate.value = '2024-10-15';
+    
+    // Update UI
+    updateFilterState();
+    
+    console.log('✅ All filters cleared');
+}
+
+// Export filter state
+function exportFilterState() {
+    const filterState = {
+        timestamp: new Date().toISOString(),
+        filters: globalFilters,
+        description: 'DebriSense Map Filter Configuration'
+    };
+    
+    const blob = new Blob([JSON.stringify(filterState, null, 2)], { 
+        type: 'application/json' 
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `debrisense_filters_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    console.log('💾 Filter state exported');
+}
+
+// Import filter state
+function importFilterState(filterData) {
+    try {
+        if (typeof filterData === 'string') {
+            filterData = JSON.parse(filterData);
+        }
+        
+        if (filterData.filters) {
+            globalFilters = { ...filterData.filters };
+            applyImportedFilters();
+            console.log('📥 Filter state imported successfully');
+            return true;
+        }
+    } catch (error) {
+        console.error('❌ Failed to import filter state:', error);
+        return false;
+    }
+}
+
+// Apply imported filters to UI
+function applyImportedFilters() {
+    // Apply state filter
+    const stateFilter = document.getElementById('stateFilter');
+    if (stateFilter) stateFilter.value = globalFilters.state;
+    
+    // Apply river filter
+    const riverFilter = document.getElementById('riverFilter');
+    if (riverFilter) riverFilter.value = globalFilters.river;
+    
+    // Apply pollution type filters
+    const pollutionTypes = {
+        'Plastic Bottles': 'plasticBottles',
+        'Plastic Bags': 'plasticBags',
+        'Food Wrappers': 'foodWrappers',
+        'Straws': 'straws',
+        'Fishing Gear': 'fishingGear',
+        'Others': 'others'
+    };
+    
+    Object.keys(pollutionTypes).forEach(type => {
+        const checkboxId = pollutionTypes[type];
+        const checkbox = document.getElementById(checkboxId);
+        if (checkbox) {
+            checkbox.checked = globalFilters.pollutionTypes.includes(type);
+        }
+    });
+    
+    // Apply date filters
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    
+    if (startDate) startDate.value = globalFilters.dateRange.start;
+    if (endDate) endDate.value = globalFilters.dateRange.end;
+    
+    // Update UI
+    updateFilterState();
+}
+
+// Get filter summary for display
+function getFilterSummary() {
+    const summary = {
+        totalFilters: 0,
+        activeFilters: [],
+        dataImpact: 'none'
+    };
+    
+    if (globalFilters.state) {
+        summary.totalFilters++;
+        summary.activeFilters.push(`State: ${globalFilters.state}`);
+    }
+    
+    if (globalFilters.river) {
+        summary.totalFilters++;
+        summary.activeFilters.push(`River: ${globalFilters.river}`);
+    }
+    
+    if (globalFilters.pollutionTypes.length < 6) {
+        summary.totalFilters++;
+        summary.activeFilters.push(`${globalFilters.pollutionTypes.length} pollution types`);
+    }
+    
+    // Determine data impact
+    if (summary.totalFilters === 0) {
+        summary.dataImpact = 'none';
+    } else if (summary.totalFilters <= 2) {
+        summary.dataImpact = 'moderate';
+    } else {
+        summary.dataImpact = 'high';
+    }
+    
+    return summary;
+}
+
+// Initialize filters when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure other scripts are loaded
+    setTimeout(() => {
+        initializeFilters();
+    }, 500);
+});
+
+// Export functions for global use
+window.filterFunctions = {
+    clearAllFilters,
+    exportFilterState,
+    importFilterState,
+    getFilterSummary,
+    getFilteredData
+}; 

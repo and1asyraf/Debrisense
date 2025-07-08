@@ -14,8 +14,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Leaflet Heatmap Plugin -->
-    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <!-- Custom CSS -->
     <link href="css/styles.css" rel="stylesheet">
 </head>
@@ -28,28 +26,163 @@
         <div class="content-wrapper">
             <div class="container-fluid">
                 <div class="row">
-                    <!-- Sidebar -->
+                    <!-- Filter Sidebar (Left Panel) -->
                     <div class="col-md-3">
-                        <div id="sidebar-placeholder"></div>
+                        <div class="filter-sidebar">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-filter me-2"></i>
+                                        Map Filters
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <!-- State Filter -->
+                                    <div class="mb-3">
+                                        <label class="form-label" for="stateFilter">State</label>
+                                        <select class="form-select" id="stateFilter" title="Select state to filter data">
+                                            <option value="">All States</option>
+                                            <option value="Selangor">Selangor</option>
+                                            <option value="Penang">Penang</option>
+                                            <option value="Perak">Perak</option>
+                                            <option value="Kedah">Kedah</option>
+                                            <option value="Perlis">Perlis</option>
+                                            <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                            <option value="Melaka">Melaka</option>
+                                            <option value="Johor">Johor</option>
+                                            <option value="Pahang">Pahang</option>
+                                            <option value="Terengganu">Terengganu</option>
+                                            <option value="Kelantan">Kelantan</option>
+                                            <option value="Sabah">Sabah</option>
+                                            <option value="Sarawak">Sarawak</option>
+                                            <option value="Kuala Lumpur">Kuala Lumpur</option>
+                                            <option value="Putrajaya">Putrajaya</option>
+                                            <option value="Labuan">Labuan</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- River Basin Filter -->
+                                    <div class="mb-3">
+                                        <label class="form-label" for="riverFilter">River Basin</label>
+                                        <select class="form-select" id="riverFilter" title="Select river basin to filter data">
+                                            <option value="">All Rivers</option>
+                                            <option value="Sungai Klang">Sungai Klang</option>
+                                            <option value="Sungai Pinang">Sungai Pinang</option>
+                                            <option value="Sungai Perak">Sungai Perak</option>
+                                            <option value="Sungai Muda">Sungai Muda</option>
+                                            <option value="Sungai Johor">Sungai Johor</option>
+                                            <option value="Sungai Pahang">Sungai Pahang</option>
+                                            <option value="Sungai Terengganu">Sungai Terengganu</option>
+                                            <option value="Sungai Kelantan">Sungai Kelantan</option>
+                                            <option value="Sungai Petagas">Sungai Petagas</option>
+                                            <option value="Sungai Sarawak">Sungai Sarawak</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Pollution Type Filter -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Pollution Type</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Plastic Bottles" id="plasticBottles" checked>
+                                            <label class="form-check-label" for="plasticBottles">Plastic Bottles</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Plastic Bags" id="plasticBags" checked>
+                                            <label class="form-check-label" for="plasticBags">Plastic Bags</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Food Wrappers" id="foodWrappers" checked>
+                                            <label class="form-check-label" for="foodWrappers">Food Wrappers</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Straws" id="straws" checked>
+                                            <label class="form-check-label" for="straws">Straws</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Fishing Gear" id="fishingGear" checked>
+                                            <label class="form-check-label" for="fishingGear">Fishing Gear</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Others" id="others" checked>
+                                            <label class="form-check-label" for="others">Others</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Date Range Filter -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Date Range</label>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label class="form-label" for="startDate">Start Date</label>
+                                                <input type="date" class="form-control" id="startDate" value="2024-07-01" title="Select start date for filtering">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label" for="endDate">End Date</label>
+                                                <input type="date" class="form-control" id="endDate" value="2024-10-15" title="Select end date for filtering">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Apply Filters Button -->
+                                    <button class="btn btn-primary w-100" onclick="applyMapFilters()">
+                                        <i class="fas fa-filter me-2"></i>
+                                        Apply Filters
+                                    </button>
+                                    
+                                    <!-- Filter Status -->
+                                    <div class="mt-3">
+                                        <small class="text-muted" id="filterStatus">
+                                            Showing all data
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Stats -->
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-chart-bar me-2"></i>
+                                        Quick Stats
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <div class="stat-item">
+                                                <div class="stat-number" id="totalZones">50</div>
+                                                <div class="stat-label">Zones</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="stat-item">
+                                                <div class="stat-number" id="totalReports">30</div>
+                                                <div class="stat-label">Reports</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <!-- Main Content Area -->
+                    <!-- Map View (Right Panel) -->
                     <div class="col-md-9">
-                        <!-- Page Header -->
-                        <div class="d-flex justify-content-between align-items-center mb-4">
+                        <!-- Map Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
-                                <h1 class="mb-1">
+                                <h4 class="mb-1">
                                     <i class="fas fa-fire me-2"></i>
                                     Marine Debris Risk Heatmap
-                                </h1>
-                                <p class="text-muted mb-0">
-                                    Interactive heatmap showing pollution risk zones across Malaysia. Click on zones or pins for detailed insights.
+                                </h4>
+                                <p class="text-muted mb-0" id="mapDescription">
+                                    Interactive heatmap showing pollution risk zones across Malaysia
                                 </p>
                             </div>
                             <div class="d-flex gap-2">
                                 <button class="btn btn-outline-primary" onclick="exportMapData()">
                                     <i class="fas fa-download me-2"></i>
-                                    Export Data
+                                    Export
                                 </button>
                                 <button class="btn btn-primary" onclick="showMapLegend()">
                                     <i class="fas fa-info-circle me-2"></i>
@@ -60,34 +193,28 @@
                         
                         <!-- Map Container -->
                         <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-fire me-2"></i>
-                                    Risk Zone Heatmap
-                                </h5>
-                            </div>
                             <div class="card-body p-0">
-                                <div id="map" class="map-container">
+                                <div id="map" class="leaflet-map">
                                     <div class="map-placeholder">
                                         <div class="text-center">
                                             <i class="fas fa-fire fa-3x mb-3"></i>
-                                            <p>Loading risk heatmap...</p>
-                                            <small class="text-muted">Click on zones or pins to view detailed insights</small>
+                                            <p>Loading interactive heatmap...</p>
+                                            <small class="text-muted">Click on zones for detailed insights</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Risk Legend -->
-                        <div class="row mt-4">
+                        <!-- Map Legend -->
+                        <div class="row mt-3">
                             <div class="col-md-8">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5 class="mb-0">
+                                        <h6 class="mb-0">
                                             <i class="fas fa-fire me-2"></i>
-                                            Risk Zone Heatmap Legend
-                                        </h5>
+                                            Risk Legend
+                                        </h6>
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
@@ -113,23 +240,16 @@
                                                 <small class="text-muted">High pollution risk</small>
                                             </div>
                                         </div>
-                                        <hr>
-                                        <div class="text-center">
-                                            <small class="text-muted">
-                                                <i class="fas fa-info-circle me-1"></i>
-                                                Click on zones or pins to view detailed insights and cleanup recommendations
-                                            </small>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5 class="mb-0">
+                                        <h6 class="mb-0">
                                             <i class="fas fa-clock me-2"></i>
                                             Last Updated
-                                        </h5>
+                                        </h6>
                                     </div>
                                     <div class="card-body">
                                         <p class="mb-1">
@@ -142,41 +262,8 @@
                                         </p>
                                         <p class="mb-0">
                                             <strong>Data Points:</strong> 
-                                            <span id="dataPoints">5 zones</span>
+                                            <span id="dataPoints">50 zones</span>
                                         </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Recent Activity -->
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-history me-2"></i>
-                                            Recent Cleanup Activity
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Date</th>
-                                                        <th>Location</th>
-                                                        <th>State</th>
-                                                        <th>River</th>
-                                                        <th>Items Collected</th>
-                                                        <th>Team</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="recentActivityTable">
-                                                    <!-- TODO: Populate with recent cleanup reports -->
-                                                </tbody>
-                                            </table>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -221,6 +308,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Leaflet.js -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Heatmap Plugin (load after Leaflet) -->
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     
     <!-- Custom Scripts -->
     <script src="data/mock-data.js"></script>

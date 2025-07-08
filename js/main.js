@@ -38,29 +38,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Load shared components
 function loadComponents() {
-    // Load navbar
-    fetch('components/navbar.html')
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('navbar-placeholder').innerHTML = html;
-        })
-        .catch(error => console.error('Error loading navbar:', error));
+    // Load navbar (if placeholder exists)
+    const navbarPlaceholder = document.getElementById('navbar-placeholder');
+    if (navbarPlaceholder) {
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(html => {
+                navbarPlaceholder.innerHTML = html;
+            })
+            .catch(error => console.error('Error loading navbar:', error));
+    }
     
-    // Load sidebar
-    fetch('components/sidebar.html')
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('sidebar-placeholder').innerHTML = html;
-        })
-        .catch(error => console.error('Error loading sidebar:', error));
+    // Load sidebar (if placeholder exists)
+    const sidebarPlaceholder = document.getElementById('sidebar-placeholder');
+    if (sidebarPlaceholder) {
+        fetch('components/sidebar.html')
+            .then(response => response.text())
+            .then(html => {
+                sidebarPlaceholder.innerHTML = html;
+            })
+            .catch(error => console.error('Error loading sidebar:', error));
+    }
     
-    // Load footer
-    fetch('components/footer.html')
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('footer-placeholder').innerHTML = html;
-        })
-        .catch(error => console.error('Error loading footer:', error));
+    // Load footer (if placeholder exists)
+    const footerPlaceholder = document.getElementById('footer-placeholder');
+    if (footerPlaceholder) {
+        fetch('components/footer.html')
+            .then(response => response.text())
+            .then(html => {
+                footerPlaceholder.innerHTML = html;
+            })
+            .catch(error => console.error('Error loading footer:', error));
+    }
 }
 
 // Initialize filters
