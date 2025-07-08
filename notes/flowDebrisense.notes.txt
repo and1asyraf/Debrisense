@@ -1,0 +1,105 @@
+# DebriSense – User Flow & Navigation Notes
+
+This note outlines how a typical user interacts with the DebriSense dashboard. Cursor should follow this flow when generating routing logic and page transitions.
+
+---
+
+## 👤 User Type
+
+- Default user: NGO, environmental agency, or internal staff
+- No login required (public dashboard access for demo)
+- Admin authentication optional (for later expansion)
+
+---
+
+## 🧭 Entry Point – Home or Dashboard
+
+### `/` or `/dashboard`
+- Fullscreen map with interactive pollution heatmap
+- Sidebar or topbar filter controls:
+  - ✅ State
+  - ✅ River
+  - ✅ Pollution Type
+  - Season toggle (Northeast/Southwest Monsoon)
+
+### Key Interactions:
+- Hover over map zones → show tooltip
+- Click a zone → open right-side detail panel or modal:
+  - Region name
+  - Risk score (from ML)
+  - Top pollution types
+  - Cleanup stats
+  - Button → “See more insights” (navigates to `/insights?region=X`)
+
+---
+
+## 📊 ML Insights – `/insights`
+
+Displays deeper data analytics and model output.
+
+### Layout:
+- Dropdown or chips: Season filter
+- Line graph: Risk score over time (seasonal trend)
+- Bar chart: Top 5 riskiest regions
+- Cards:
+  - Region highlights (e.g., “Klang River Basin: High Risk”)
+  - ML explanations
+- Export button → CSV (dummy only)
+
+---
+
+## 📄 Cleanup Reports – `/reports`
+
+### Purpose:
+- List all cleanup events (from Reef Check or mock data)
+- Display top polluting item types
+- Filterable by state, river, or date
+
+### UI:
+- Table or cards: Cleanup date, location, top 3 waste types
+- Button: “Add Report” (mock modal with form inputs)
+- Charts: Pie chart of item distribution
+- Optional CSV import/export
+
+---
+
+## 🧰 NGO Tools – `/tools`
+
+### Goal:
+Support environmental stakeholders in planning cleanups.
+
+### Features:
+- Cleanup calendar (read-only mock)
+- Exportable region summaries (CSV)
+- Cleanup targeting guide (based on risk zones)
+- Regional scorecard (risk + cleanup activity + recommended action)
+
+---
+
+## ❌ 404 or No Match – `/notfound`
+Basic empty page with soft error message if route invalid
+
+---
+
+## 🔗 Global Navigation (Header or Sidebar)
+
+Use consistent page links:
+
+- Dashboard 🗺️ `/dashboard`
+- Insights 📊 `/insights`
+- Reports 📄 `/reports`
+- NGO Tools 🧰 `/tools`
+
+Optional:
+- Settings ⚙️
+- Logout 🔒 (if user roles added later)
+
+---
+
+## 💡 Cursor Implementation Notes
+
+- Use clear route file or routing logic
+- Use dynamic routing with params if needed (e.g., `?region=Selangor`)
+- Include `// TODO` comments for pages needing real backend later
+- Sidebar should highlight current page (active state)
+- Maintain sticky filters if user switches pages (optional for UX)

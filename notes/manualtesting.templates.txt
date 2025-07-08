@@ -1,0 +1,201 @@
+# 🛠️ DebriSense Manual UX Review & Brainstorming Template
+
+**Project:** DebriSense – Environmental Intelligence Dashboard  
+**Goal:** Help the team review and brainstorm the frontend UI before submission  
+**For:** Internal team members only (developers, designers, ML team) — not judges  
+
+---
+
+## 📋 Basic Info Section
+
+| Field | Response |
+|-------|----------|
+| **Tester Name:** | _________________ |
+| **Date:** | _________________ |
+| **Device Used:** | _________________ |
+| **Any bugs found before starting?** | Yes / No |
+
+---
+
+## 📄 Page-by-Page Feedback Table
+
+### 🏠 Dashboard Page (`/dashboard`)
+
+| Task/Feature Tested | Does it work? (Y/N) | Confusing or unclear? | Suggestions/Ideas | Bug (Y/N) |
+|-------------------|---------------------|----------------------|-------------------|-----------|
+| Loading the dashboard | | | | |
+| Viewing the map with debris locations | | | | |
+| Clicking on map pins to see details | | | | |
+| Applying filters (date range, location) | | | | |
+| Viewing charts and statistics | | | | |
+| Using the "Apply Filters" button | | | | |
+| Navigating between different sections | | | | |
+| Responsive design on mobile/tablet | | | | |
+
+### 📊 Insights Page (`/insights`)
+
+| Task/Feature Tested | Does it work? (Y/N) | Confusing or unclear? | Suggestions/Ideas | Bug (Y/N) |
+|-------------------|---------------------|----------------------|-------------------|-----------|
+| Loading insights page | | | | |
+| Viewing different chart types | | | | |
+| Interacting with charts (hover, click) | | | | |
+| Filtering data by time period | | | | |
+| Switching between chart views | | | | |
+| Exporting data or charts | | | | |
+| Understanding the data visualization | | | | |
+| Mobile responsiveness of charts | | | | |
+
+### 📈 Reports Page (`/reports`)
+
+| Task/Feature Tested | Does it work? (Y/N) | Confusing or unclear? | Suggestions/Ideas | Bug (Y/N) |
+|-------------------|---------------------|----------------------|-------------------|-----------|
+| Loading reports page | | | | |
+| Generating new reports | | | | |
+| Selecting report parameters | | | | |
+| Downloading/exporting reports | | | | |
+| Viewing historical reports | | | | |
+| Understanding report data | | | | |
+| Sharing reports functionality | | | | |
+| Report customization options | | | | |
+
+### 🛠️ Tools Page (`/tools`)
+
+| Task/Feature Tested | Does it work? (Y/N) | Confusing or unclear? | Suggestions/Ideas | Bug (Y/N) |
+|-------------------|---------------------|----------------------|-------------------|-----------|
+| Loading tools page | | | | |
+| Accessing NGO tools | | | | |
+| Using data analysis tools | | | | |
+| Understanding tool descriptions | | | | |
+| Downloading resources | | | | |
+| Contacting support | | | | |
+| Tool categorization | | | | |
+| Mobile access to tools | | | | |
+
+---
+
+## ⭐ UI/UX Quick Ratings (1–5 Scale)
+
+| Category | Rating (1–5) | Notes |
+|----------|--------------|-------|
+| **Page Layout Clarity** | _____ | |
+| **Button/Filter Behavior** | _____ | |
+| **Visual Design Consistency** | _____ | |
+| **Overall Feel (Smooth or Clunky)** | _____ | |
+| **Navigation Intuitiveness** | _____ | |
+| **Data Visualization Clarity** | _____ | |
+| **Mobile User Experience** | _____ | |
+| **Loading Speed & Performance** | _____ | |
+
+**Rating Guide:**
+- 1 = Terrible / Broken
+- 2 = Poor / Confusing  
+- 3 = Okay / Acceptable
+- 4 = Good / Clear
+- 5 = Excellent / Intuitive
+
+---
+
+## 🧠 Freeform Notes Section
+
+### 💡 What new ideas came up while testing?
+```
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+```
+
+### 🐞 Any unexpected bugs?
+```
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+```
+
+### 😕 Anything confusing or unnecessary?
+```
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+```
+
+### 💡 What small tweaks could improve it?
+```
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+```
+
+### 🎯 What features would make this even better?
+```
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+```
+
+### 🔍 Any accessibility issues noticed?
+```
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+```
+
+---
+
+## 📝 Team Discussion Notes
+
+### 🎯 Key Strengths
+```
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+```
+
+### ⚠️ Critical Issues to Fix
+```
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+```
+
+### 🚀 Quick Wins (Easy improvements)
+```
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+```
+
+### 🎨 Design/UX Improvements
+```
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+```
+
+---
+
+## ✅ Final Checklist
+
+- [ ] All pages tested
+- [ ] Mobile responsiveness checked
+- [ ] All interactive elements tested
+- [ ] Data visualization clarity assessed
+- [ ] Navigation flow reviewed
+- [ ] Performance issues noted
+- [ ] Accessibility concerns documented
+- [ ] Team feedback collected
+
+---
+
+**📅 Review Date:** _________________  
+**👥 Team Members Present:** _________________  
+**📋 Next Steps:** _________________  
+
+---
+
+*This template is for internal team use only. Keep feedback constructive and actionable! 🚀*

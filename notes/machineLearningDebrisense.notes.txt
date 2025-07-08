@@ -1,0 +1,79 @@
+# DebriSense – Machine Learning Integration Notes
+
+This note defines how machine learning works behind the scenes to support the DebriSense dashboard. Cursor should **simulate** prediction outputs in the frontend using placeholder data, but structure the UI in a way that makes it easy to plug in real model results later.
+
+---
+
+## 🎯 Goal of ML in DebriSense
+
+To predict the **likelihood and severity of marine plastic pollution** in specific regions, based on environmental, geographical, and human activity factors.
+
+The prediction is output as a **risk score** (0.0 to 1.0) for each geographic area (e.g., river segment, coastal zone) and updated per season.
+
+---
+
+## 🤖 What the ML Model Predicts
+
+Each prediction gives:
+- `region_id`: Geographic zone or river name
+- `season`: "Northeast Monsoon" or "Southwest Monsoon"
+- `predicted_risk_score`: Float between 0.0 and 1.0
+- `top_pollution_types`: ["Plastic Bottles", "Food Wrappers", …]
+
+These values are used to:
+- Color heatmap overlays (e.g., red = high risk)
+- Populate charts on the `/insights` page
+- Support exportable summaries for NGOs or government
+
+---
+
+## 📥 Input Features (for Cursor Reference Only)
+
+These features are fed into the model for each region:
+- Cleanup density (from CleanupReport data)
+- Terrain slope / elevation gradient (from DEM data)
+- Flow accumulation & proximity to rivers (from HydroSHEDS)
+- Population density (urban areas near rivers/coasts)
+- Historical monsoon data (e.g., rainfall, wind)
+- Time of year (seasonal indicator)
+
+Cursor **does not** need to simulate these inputs, but should **design frontend components** to reflect their importance (e.g., tags or explanations under graphs).
+
+---
+
+## 📊 How ML Results Are Used in the Frontend
+
+1. **Interactive Heatmap**  
+   - Uses `predicted_risk_score` to color-code zones
+   - Hover/click reveals predicted pollution type breakdown
+
+2. **ML Insights Page (`/insights`)**
+   - Season toggle → changes predicted outputs
+   - Line charts → Risk trends over time per river/state
+   - Bar chart → Top 5 riskiest zones
+   - Cards → ML-generated recommendations
+
+3. **Export Options**
+   - Download predicted data as CSV or JSON (mock only)
+
+---
+
+## 🧪 Notes for Cursor
+
+- Store ML prediction results in a mock JSON variable
+- Simulate model updates by letting user switch seasons or filters
+- Include explanation tooltips: “This prediction is based on X, Y, Z”
+- Add `// TODO: Replace with live ML API` markers in key data pulls
+- UI components should support dynamic updates (e.g., seasonal refresh)
+
+---
+
+## Mock Data Example
+
+```json
+{
+  "region_id": "Sg. Klang Basin",
+  "season": "Northeast Monsoon",
+  "predicted_risk_score": 0.87,
+  "top_pollution_types": ["Plastic Bottles", "Food Wrappers", "Bags"]
+}

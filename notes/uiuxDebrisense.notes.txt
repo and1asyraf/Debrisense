@@ -1,0 +1,110 @@
+# DebriSense – UI/UX Design System Notes
+
+These notes define the overall visual and interaction design for DebriSense. Cursor should apply this styling consistently across all pages using CSS classes or utility frameworks (e.g., TailwindCSS, Bootstrap, or raw CSS if preferred).
+
+---
+
+## 🎨 Visual Theme & Mood
+
+DebriSense should feel clean, environmental, and institutional — not playful.
+
+### Tone:
+- Professional and data-driven
+- Focused on environmental impact
+- Clarity over complexity
+
+### Color Palette:
+- Primary: `#2E7D32` (Forest Green)
+- Secondary: `#81C784` (Light Green)
+- Accent: `#FFC107` (Amber)
+- Neutral Background: `#F5F5F5` (Soft Gray)
+- Text: `#263238` (Dark Gray)
+- Heatmap Scale:
+  - Low Risk: `#A5D6A7` (Soft Green)
+  - Moderate Risk: `#FFF176` (Soft Yellow)
+  - High Risk: `#EF5350` (Red)
+
+---
+
+## 🧱 Layout & Structure
+
+### General:
+- Fixed top navbar with app name/logo
+- Sidebar or topbar filters for dashboard pages
+- Main area for cards, maps, tables
+- Section headers with bold titles and icons
+
+### Page Behavior:
+- Desktop-first layout (min-width 1280px ideal)
+- Scrollable content panels
+- Responsive on tablets, but mobile is not primary target
+
+---
+
+## 🧩 Components & Cards
+
+### Reusable Card Style:
+- Rounded corners (`border-radius: 12px`)
+- Soft shadows (`box-shadow: 0 2px 8px rgba(0,0,0,0.1)`)
+- Padding: `16px` minimum
+- Title + subtitle layout at the top
+- Icon/avatar on left or corner
+
+### Components to Style Consistently:
+- Region Detail Cards (clicked heatmap zone)
+- Risk Insight Tiles (score, icon, graph)
+- Report Table Rows
+- Chart Containers (with headers + buttons)
+
+---
+
+## 🖱️ UI Interaction Rules
+
+- Heatmap hover = soft glow or border
+- Clickable elements (buttons/cards) = change color slightly on hover
+- Tooltip delay: 0.2s on hover (for map regions or charts)
+- Sidebar filter inputs = dropdowns or checkboxes
+- Use modals for:
+  - Region details
+  - Add report
+  - Export popup
+
+---
+
+## 🔣 Typography
+
+- Use `Roboto`, `Open Sans`, or `Inter` (fallback: sans-serif)
+- Titles: `20–24px`, bold
+- Subheadings: `16–18px`, medium
+- Body: `14–16px`, normal
+- Labels: `12–14px`, all caps or uppercase optional
+
+---
+
+## 🧪 Visual Feedback & Animations
+
+- Snackbar for actions (e.g., “Report Added”)
+- Button loading spinner on data actions
+- Card "shimmer" effect on initial page load
+- Page transition fade or slide (optional)
+
+---
+
+## 🖼️ Icons & Illustrations
+
+- Use flat icons (Material Icons or Feather Icons)
+- Example:
+  - Trash = 🗑️
+  - River = 🌊
+  - Risk = ⚠️
+  - Filters = 🧩
+- Optional: Add placeholder illustrations in empty states (e.g., “No reports yet”)
+
+---
+
+## 📌 Notes for Cursor
+
+- Use a shared layout or component system (`components/` or `partials/`)
+- Consistent color + spacing throughout app
+- Use `// TODO: Link real data` or `// Placeholder content` where applicable
+- Use CSS variables or tailwind classes to simplify palette updates

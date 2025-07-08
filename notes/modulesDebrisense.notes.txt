@@ -1,0 +1,131 @@
+# DebriSense Modules – Generation Specification
+
+DebriSense is an AI-powered web dashboard for visualizing and predicting marine plastic pollution hotspots in Malaysia. This file defines the modules to be generated into the frontend UI using mock data.
+
+---
+
+## 1. National Heatmap Viewer
+
+**Purpose:**  
+To display a nationwide heatmap of plastic debris risk, clickable by region.
+
+**What to Build:**
+- An interactive map (Leaflet.js or similar)
+- Color-coded risk zones by state and river basin
+- Region click opens a modal or sidebar with more info
+- Filters at the top or side (State, River, Pollution Type)
+- Use mock GeoJSON or marker overlays
+
+---
+
+## 2. Cleanup Report Manager
+
+**Purpose:**  
+To display a list/table of past cleanup events and collected data.
+
+**What to Build:**
+- A searchable/sortable table of mock cleanup reports
+- Each row includes date, river, location, plastic categories (e.g., bottles, bags)
+- Modal popup for “View More” showing full report
+- CSV download button (mock only)
+
+---
+
+## 3. ML Risk Insights Panel
+
+**Purpose:**  
+To show predictive insights from ML models about future plastic risk.
+
+**What to Build:**
+- Line chart showing risk scores over months or seasons
+- Pie or bar charts for waste types or river contributions
+- Cards showing “Top 5 Risk Zones”
+- Mock JSON used as source for all visuals
+
+---
+
+## 4. Add Cleanup Report Form
+
+**Purpose:**  
+To allow the user (e.g., NGO staff) to submit a new cleanup report manually.
+
+**What to Build:**
+- A structured form (river dropdown, date picker, location input, item counts)
+- Button for mock “Submit” with confirmation modal or snackbar
+- Use placeholder storage (`console.log()` or static JS array)
+
+---
+
+## 5. Manual Observation Logger
+
+**Purpose:**  
+To let users record observed pollution events (field data without cleanup).
+
+**What to Build:**
+- A small form with name, date, river, pollution type, optional photo upload (mock)
+- Submit button with visual feedback
+- Form data stored temporarily in mock variable
+
+---
+
+## 6. Admin & Data Tools Panel
+
+**Purpose:**  
+For internal use by developers or admins to simulate data management tasks.
+
+**What to Build:**
+- Buttons for:
+  - Exporting mock data
+  - Resetting app state
+  - Uploading new CSV (no parsing needed yet)
+  - Toggling between monsoon seasons
+- Admin-only section on a separate route like `/admin`
+
+---
+
+## 7. ML Engine (Backend Placeholder)
+
+**Purpose:**  
+To act as the backend logic for model predictions (later to be connected).
+
+**What to Simulate:**
+- Use dummy JSON to simulate:
+  - Risk scores by state/river
+  - Seasonal comparisons
+  - Debris flow index outputs
+- Include `// TODO: Connect to backend ML model` comments
+
+---
+
+## 8. Filter & Query Logic (Frontend Only)
+
+**Purpose:**  
+To allow users to filter all views by State, River, or Pollution Type.
+
+**What to Build:**
+- Dropdowns or toggle buttons
+- Filters should update map, reports, insights all at once
+- Can use global JS variables to simulate filter state
+
+---
+
+## 9. Static Informational Pages (Optional)
+
+**Purpose:**  
+Provide context about the project and data sources.
+
+**What to Build:**
+- “About” page with project mission
+- “Data Sources” list with fake or real references
+- Contact/credit sections (mock only)
+
+---
+
+## Notes for Cursor:
+
+- All screens should use clean, modular HTML/CSS layout (Bootstrap preferred)
+- Use `cards`, `tables`, `modals`, `charts`, and `map` components
+- All logic should work with static mock data first
+- Include placeholder elements where dynamic features will be integrated
+- Add `// TODO:` comments for backend/API/ML logic later
+

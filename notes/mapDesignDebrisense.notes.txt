@@ -1,0 +1,83 @@
+# DebriSense – Heatmap & Map Design Notes
+
+This note guides the structure, tech, and behavior of the main interactive map. The map serves as the primary interface for viewing and interacting with marine plastic pollution predictions.
+
+---
+
+## 🧭 Purpose
+
+The map is the central element on the `/dashboard` page. It provides:
+- A visual representation of marine plastic **risk zones** across Malaysia
+- Interactivity to explore details by region, river, or state
+- A filterable, explorable experience
+
+---
+
+## 🗺️ Map Tech Stack
+
+- Use **Leaflet.js** (lightweight, flexible map library)
+- Base tiles: OpenStreetMap or CartoDB (light theme)
+- Overlay: GeoJSON or bounding boxes for regional zones
+- Heat color scale based on `predicted_risk_score`:
+  - Green (0.0–0.3): Low risk
+  - Yellow (0.31–0.6): Moderate risk
+  - Red (0.61–1.0): High risk
+
+---
+
+## 🧩 Interactive Behavior
+
+### 1. Hover Behavior:
+- Tooltip displays:
+  - Region name (e.g., "Sg. Klang Basin")
+  - Current risk score
+  - Top 2 pollution types
+
+### 2. Click Behavior:
+- Opens a **detail panel** or **popup modal**
+- Panel shows:
+  - Full region info
+  - Risk breakdown (pie/bar)
+  - Cleanup stats (mock)
+  - Link to `/insights` or `/reports` filtered by region
+
+### 3. Filter Controls (Top/Sidebar):
+- Dropdowns or checkboxes:
+  - ✅ Filter by State
+  - ✅ Filter by River
+  - ✅ Filter by Pollution Type (e.g., Plastics, Food Wrappers)
+- Season toggle (Northeast / Southwest)
+
+### 4. Legend:
+- Simple color bar showing Risk Score gradient
+- Optional: clickable legend to highlight all "High Risk" zones
+
+---
+
+## 🔧 Notes for Cursor
+
+- All map zones should be mock regions (use fake GeoJSON if needed)
+- Simulate filtering by hiding/showing overlays
+- Make regions clickable & visually distinct on hover
+- Make the map **fullscreen width**, responsive only for desktop
+- Add a `// TODO: Integrate real GeoJSON and ML data` note
+
+---
+
+## 💡 Bonus Suggestions (Optional)
+
+- Add “Last Updated” timestamp for predictions
+- Include mock "zoom to location" button (e.g., zoom to Johor)
+- Optional: Satellite toggle (map vs satellite imagery view)
+
+---
+
+## Summary of Layers
+
+- **Base Layer**: OSM light or Carto
+- **Overlay Layer**: Regional heat zones
+- **Interactivity**:
+  - Hover: tooltip
+  - Click: popup/modal
+  - Filters: State, River, Pollution Type
+- **Visual Scaling**: Red-yellow-green based on score

@@ -1,0 +1,120 @@
+# DebriSense – Pages to Generate (Frontend Navigation Spec)
+
+These are the main user-facing pages to be created in the front-end. Use mock data and placeholder elements to simulate full functionality.
+
+---
+
+## 1. /dashboard (Home Heatmap View)
+
+**Purpose:**  
+This is the primary page users land on. Shows interactive marine plastic risk heatmap.
+
+**Elements:**
+- Fullscreen heatmap with colored regions (Leaflet.js)
+- Sidebar or top panel for filters:
+  - State, River, Pollution Type
+- Clickable regions show modal or detail card
+- Basic legend and risk scale
+- Mock GeoJSON or bounding boxes
+
+---
+
+## 2. /reports (Cleanup Report List)
+
+**Purpose:**  
+Displays a table of past cleanup activities and allows admins to add new ones.
+
+**Elements:**
+- Table view of `CleanupReport` entries
+- Columns: Date, Location, River, State, Bottles, Bags, etc.
+- "Add Report" button → opens modal form (or redirects to `/add-report`)
+- Export CSV (mock button)
+
+---
+
+## 3. /add-report (Cleanup Report Submission)
+
+**Purpose:**  
+Form page to submit new cleanup activity manually.
+
+**Elements:**
+- Input fields for:
+  - Location, State, River, Date
+  - Item counts (bottles, bags, etc.)
+  - Submitter name
+- Submit button with confirmation popup/snackbar
+- Store in mock JS variable
+
+---
+
+## 4. /observations (Field Observation Logger)
+
+**Purpose:**  
+Allows users to report marine debris sightings without a formal cleanup.
+
+**Elements:**
+- Small form with:
+  - Observer name, Location, Pollution Type
+  - Optional photo (mock)
+  - Submit button
+- Entries appear in `/observations-log` (optional page)
+
+---
+
+## 5. /insights (ML Risk Predictions & Analysis)
+
+**Purpose:**  
+Show predictive risk insights based on machine learning models.
+
+**Elements:**
+- Season switcher toggle (e.g., Northeast / Southwest Monsoon)
+- Risk trend line chart over time
+- Bar chart of top polluted rivers
+- "Top 5 Hotspot Zones" card
+- All pulled from `ML_PredictionZone` or `RiskInsightSummary`
+
+---
+
+## 6. /admin (Admin Tools)
+
+**Purpose:**  
+Dev/admin-only page for testing actions or resetting data.
+
+**Elements:**
+- Buttons for:
+  - Toggle season state
+  - Reset mock data
+  - Export all data (mock)
+  - Upload CSV (no parsing needed)
+- Action log viewer (optional)
+
+---
+
+## 7. /about (Optional Static Page)
+
+**Purpose:**  
+Static content describing DebriSense project goals, data sources, and credits.
+
+**Elements:**
+- Markdown-style text
+- Project background
+- Partner acknowledgements
+- SDG badges/logos (optional)
+
+---
+
+## Routing Notes
+
+- Use clean URL routing (e.g., `/dashboard`, not `/index.html`)
+- Each page = single HTML file with its own CSS/JS bundle or shared layout
+- Use `<nav>` or sidebar for routing between pages
+- Responsive layout is secondary (optimize for desktop first)
+
+---
+
+## Notes to Cursor:
+
+- These pages should be scaffolded with placeholder content
+- Each page should include `// TODO: Integrate real data` comments
+- Simulate user interaction: modals, form submissions, filters, etc.
+- Use consistent layout structure (e.g., shared header/sidebar)

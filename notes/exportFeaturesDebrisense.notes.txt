@@ -1,0 +1,77 @@
+# DebriSense – Export & Admin Feature Notes
+
+This file defines how users (NGOs, cleanup teams, internal staff) can export useful data from DebriSense. These features support decision-making, reporting, and documentation.
+
+---
+
+## 🎯 Purpose of Export Tools
+
+Users can:
+- Download filtered data for offline analysis
+- Share cleanup or risk reports with stakeholders
+- Back up insights for inclusion in policy documents
+
+---
+
+## 📦 Exportable Formats
+
+- CSV (preferred)
+- XLSX (optional for styling)
+- GeoJSON (for map zones and predictions – optional)
+
+---
+
+## 🧭 Where Export Options Appear
+
+### 1. `/insights`
+- **Export risk scores by region**
+  - Button: “Download Regional Risk Table”
+  - Data: Region Name, State, Risk Score, Pollution Type
+
+- **Export prediction trends**
+  - Line graph export as CSV:
+    - Fields: Region, Date, Season, Predicted Score
+
+### 2. `/reports`
+- **Export cleanup event logs**
+  - Button: “Export Cleanup Events”
+  - Fields: Date, Location, Top Items, Amount Collected
+
+- **Export top waste items**
+  - Pie/bar chart summary by type
+  - CSV download: Waste Item, Frequency, % of Total
+
+### 3. `/tools`
+- **Export targeted cleanup plan**
+  - Regional cleanup suggestion based on risk zone
+  - CSV fields: Region, Risk Level, Recommended Action, Nearest Access Point
+
+---
+
+## 🖱️ UI Behavior
+
+- Export buttons should:
+  - Have clear label (e.g., “📤 Export CSV”)
+  - Show tooltip or mini confirmation on click
+  - Use file naming convention: `debrisense_report_[section]_[YYYY-MM-DD].csv`
+
+- Allow exporting filtered data only (if filters active)
+- Disable button with note if no data selected
+
+---
+
+## 🔒 Admin-only Features (optional)
+
+- If login is implemented, admin users could:
+  - View data audit logs (e.g., report added/edited)
+  - Export full database snapshot
+  - Generate weekly/monthly analytics packages
+
+---
+
+## 📌 Cursor Implementation Notes
+
+- Simulate export buttons with mock data download (no backend required)
+- Attach `// TODO: Connect to real backend export API` near buttons
+- Export logic can call dummy file generation (Blob or FileSaver.js)
+- UI should show export-ready tables or visual previews before downloading

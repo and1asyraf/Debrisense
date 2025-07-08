@@ -1,0 +1,100 @@
+# DebriSense: AI-Powered Marine Debris Intelligence Dashboard
+
+## 🌍 Overview
+DebriSense is a web-based environmental intelligence platform designed to detect, predict, and visualize plastic pollution hotspots across Malaysia’s rivers and coastlines. It integrates geospatial data, machine learning predictions, and environmental records into an interactive dashboard that informs decision-making for environmental stakeholders.
+
+This project was built under Challenge 2: “Marine Pollution Detection & Response Using Big Data.”
+
+---
+
+## 🎯 Problem Statement
+Malaysia faces a growing marine plastic crisis — with plastic waste leaking from inland areas via rivers, especially during seasonal monsoons. However, there is currently **no centralized system** that:
+- Maps where this debris accumulates and flows
+- Predicts where future pollution risks will emerge
+- Helps cleanup teams decide where to act
+
+**DebriSense solves this.**
+
+---
+
+## 🔍 What DebriSense Does
+
+1. **Detects Plastic Debris Hotspots**
+   - Uses satellite imagery (e.g., Sentinel-2 with Floating Debris Index)
+   - Leverages beach cleanup records (e.g., Reef Check Malaysia’s ICC data)
+   - Extracts pollution events from reports and manual observations
+
+2. **Predicts Marine Plastic Risk**
+   - Trains ML models using seasonal, hydrological, and demographic data
+   - Forecasts risk scores based on:
+     - River proximity
+     - Flow accumulation (DEM data from HydroSHEDS)
+     - Population density
+     - Seasonal patterns (e.g., monsoon period)
+
+3. **Visualizes Source-to-Sea Leakage**
+   - Displays an **interactive heatmap** of regions with current + future risk
+   - Simulates debris pathways from inland areas to coastal waters
+   - Allows filtering by river, state, pollution type
+
+4. **Supports Cleanup & Policy Planning**
+   - Offers data-backed insights for cleanup event planning
+   - Provides exportable risk reports for NGOs or local councils
+   - Helps align with national frameworks (e.g., Malaysia’s National Marine Litter Policy 2021–2030)
+
+---
+
+## 💡 Target Users
+- Environmental NGOs (e.g., Reef Check, EcoKnights)
+- Government departments (e.g., DOE, local municipal councils)
+- Cleanup organizers, coastal townships, marine park authorities
+- Research teams, universities, and climate innovation labs
+
+**DebriSense is NOT a public-facing mobile app.** It is a **desktop-optimized web dashboard** intended for institutional or professional use.
+
+---
+
+## ⚙️ Technical Summary
+- Frontend: HTML, CSS, JavaScript (using Bootstrap, jQuery, Chart.js, Leaflet.js)
+- Backend (future): Python (Flask or Django), connected to ML models and database
+- ML Integration: Predictive modeling for seasonal risk zones using preprocessed datasets
+- Data Sources:
+  - Reef Check Malaysia’s cleanup reports (PDF/CSV)
+  - HydroSHEDS DEM flow data
+  - Sentinel-2 imagery with FDI/NDVI pre-processing
+  - Population density from WorldPop or local census
+
+---
+
+## 🌐 Geographic Scope
+- **National Coverage**: Peninsular Malaysia, Sabah, and Sarawak
+- Focused on rivers that flow into the sea (major catchments)
+- Supports zoom & analysis by state, district, and river basin
+
+---
+
+## 🧩 Why DebriSense Is Unique
+- Most competing ideas use **real-time IoT sensors** or **floating devices**
+- DebriSense focuses on **historical and predictive intelligence**, using:
+  - Satellite imagery
+  - Cleanup event patterns
+  - Hydrology-based modeling
+- It’s a **data fusion + analytics tool**, not a physical device or sensor deployment system
+
+---
+
+## 🧭 Purpose of the Frontend UI
+- Provide an interactive, visually intuitive dashboard
+- Enable users to:
+  - Explore pollution maps and predictions
+  - View and upload cleanup reports
+  - Filter insights by season, river, state
+  - Download risk summaries for action
+
+---
+
+## 🎯 Vision Statement
+**"Smarter Predictions, Cleaner Coasts."**
+
+DebriSense empowers stakeholders with the data they need to take early, focused action — helping Malaysia protect marine ecosystems from the plastic crisis using big data and AI.
+

@@ -1,0 +1,92 @@
+# DebriSense – Filtering System Notes
+
+These notes define the filtering system across the dashboard, map, and data pages. Cursor should ensure that all filters are interactive (even with mock data) and context-aware.
+
+---
+
+## 🎯 Goal of Filters
+
+Filters let users:
+- Narrow down visible regions on the heatmap
+- Focus on specific states, rivers, or pollution types
+- Explore data seasonally (e.g., monsoon vs dry)
+
+---
+
+## 📍 Where Filters Appear
+
+### 1. `/dashboard` (Map View)
+- Primary location for top-level filters
+- Filters update map overlays and detail panel content
+
+### 2. `/insights`
+- Filters control what regional trends and charts are displayed
+
+### 3. `/reports`
+- Filters apply to list of cleanup events and waste types shown
+
+### 4. `/tools`
+- Optional prefilter for downloadable recommendations
+
+---
+
+## 🧰 Filter Types & Behavior
+
+### 1. **State Filter**
+- Type: Dropdown (single or multi-select)
+- Values: Hardcoded list of Malaysian states (e.g., Selangor, Sabah)
+- Updates:
+  - Heatmap view (only regions in that state)
+  - Report list & charts
+  - Cleanup zone suggestions
+
+### 2. **River Filter**
+- Type: Dropdown or autocomplete
+- Values: Major rivers (e.g., Sg. Klang, Sg. Segget)
+- Updates:
+  - Filters zones touching the selected river basin
+  - Insights and reports linked to river catchment
+
+### 3. **Pollution Type Filter**
+- Type: Checkbox list (multi-select)
+- Examples: Plastics, Bottles, Food Wrappers, Cigarette Butts
+- Used to:
+  - Filter cleanup events
+  - Refine risk model overlays (optional)
+
+### 4. **Season Filter**
+- Type: Toggle or radio
+- Options:
+  - Northeast Monsoon
+  - Southwest Monsoon
+- Updates:
+  - ML predictions shown
+  - Risk trend charts (in `/insights`)
+  - Region summaries
+
+---
+
+## 🖱️ UI/UX Behavior
+
+- Filters persist across navigation (optional)
+- Each filter component should:
+  - Display current selection
+  - Allow deselection
+  - Collapse on smaller screens (if used)
+
+---
+
+## 📌 Cursor Implementation Notes
+
+- Place all filter widgets in a shared component directory
+- Use mock filter handlers to simulate updates
+- Group filters visually in sidebar or horizontal toolbar
+- Use `// TODO: Connect filter to real backend` in logic
+- Dummy default: All filters selected (show full map/data)
+
+---
+
+## 🧪 Bonus (Optional)
+
+- Add search bar to river/state dropdowns for ease
+- Show active filters as tags/pills above content (e.g., `State: Selangor ⓧ`)

@@ -1,0 +1,93 @@
+# DebriSense – Data Dictionary for Mock Frontend Generation
+
+Use these entities to create sample JSON mock data for the dashboard UI.
+These objects will simulate real backend/API responses and will later be replaced with actual machine learning and geospatial pipelines.
+
+---
+
+## Entity: CleanupReport
+
+Represents data collected during a real-world beach/river cleanup event.
+
+**Fields:**
+- `id`: string (e.g., "CR1003")
+- `location`: string (e.g., "Tanjung Aru Beach")
+- `state`: string (e.g., "Sabah")
+- `river`: string (e.g., "Sungai Petagas")
+- `date`: ISO string (e.g., "2024-10-12")
+- `plastic_items`: object
+  - `plastic_bottles`: number
+  - `plastic_bags`: number
+  - `straws`: number
+  - `food_wrappers`: number
+  - `others`: number
+- `submitted_by`: string (e.g., "Reef Check Team A")
+- `source`: string (e.g., "ICC Event 2024")
+
+---
+
+## Entity: PollutionObservation
+
+Manual field report of visible marine pollution, submitted without formal cleanup.
+
+**Fields:**
+- `id`: string
+- `observer_name`: string
+- `location`: string (free text or dropdown)
+- `river`: string
+- `state`: string
+- `date`: ISO string
+- `pollution_type`: string (e.g., "Floating debris", "Oil residue", "Microplastics")
+- `notes`: string
+
+---
+
+## Entity: ML_PredictionZone
+
+Used for heatmap overlays and charts. Each entry represents a geographic area (district, coastline, river segment).
+
+**Fields:**
+- `id`: string
+- `state`: string
+- `river_basin`: string
+- `season`: string ("Northeast Monsoon", "Southwest Monsoon")
+- `predicted_risk_score`: number (0.0 to 1.0 scale)
+- `top_pollution_types`: array of strings (e.g., ["Plastic Bottles", "Food Wrappers"])
+- `last_updated`: ISO string
+
+---
+
+## Entity: RiskInsightSummary
+
+Summary analytics used to populate ML insights section.
+
+**Fields:**
+- `region`: string (e.g., "East Coast Zone")
+- `high_risk_rivers`: array of strings
+- `average_risk_score`: number
+- `season`: string
+- `trend`: string (e.g., "Increasing", "Stable", "Decreasing")
+- `recommendations`: array of strings (e.g., ["Increase cleanup in Sg. Muar", "Monitor Klang River monthly"])
+
+---
+
+## Entity: AdminActionLog (Mock only)
+
+Tracks user/admin activity in the system.
+
+**Fields:**
+- `id`: string
+- `username`: string
+- `action`: string (e.g., "Submitted cleanup report")
+- `timestamp`: ISO string
+- `target_id`: string (e.g., related CleanupReport or Observation)
+
+---
+
+## Notes to Cursor:
+
+- Use these entity schemas to structure mock data across the UI
+- JSON files or inline arrays are acceptable (simulate API responses)
+- All charts, tables, and map layers should pull from these sample objects
+- Add comments like `// TODO: Replace with API call` wherever mock data is used
+

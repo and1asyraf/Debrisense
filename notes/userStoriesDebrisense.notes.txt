@@ -1,0 +1,95 @@
+# User Stories – DebriSense Dashboard
+
+These user stories describe how typical users interact with DebriSense. Each story corresponds to a real module, and can be used to generate interfaces, forms, filters, and charts that match actual usage.
+
+---
+
+## 1. Government Environmental Officer – Identify High-Risk Rivers
+
+"As a government officer from the Department of Environment, I want to use the DebriSense dashboard to identify which rivers have the highest predicted plastic pollution risk for the next monsoon season so that we can deploy cleanup funding to the right districts."
+
+**Steps:**
+- Opens the DebriSense dashboard on a desktop
+- Sees a color-coded heatmap of Malaysia
+- Applies filters: State = "Selangor", Season = "Northeast Monsoon"
+- Clicks on high-risk river zones
+- Views a prediction panel with supporting ML charts and insights
+- Downloads the CSV report to include in internal planning document
+
+**Output:**  
+Region-specific insight report + predicted hotspot visualizations
+
+---
+
+## 2. NGO Cleanup Coordinator – Log a Cleanup Event
+
+"As a cleanup team leader from Reef Check Malaysia, I want to submit data from our recent beach cleanup so that it can be used in pollution trend models and shared with government and public stakeholders."
+
+**Steps:**
+- Navigates to “Add Cleanup Report” section
+- Fills out form fields: location, date, number of plastic items by category
+- Selects river name and coastal state from dropdowns
+- Clicks “Submit” → Sees confirmation
+- (Later) The new data appears in the Cleanup Report List module
+
+**Output:**  
+One new cleanup report saved in system (mock), visible to others
+
+---
+
+## 3. Data Scientist – Compare Past vs. Predicted Hotspots
+
+"As a data scientist collaborating with DebriSense, I want to compare plastic pollution levels from the last 12 months with the predicted risk levels for the coming season, so I can test model accuracy and optimize future input parameters."
+
+**Steps:**
+- Goes to the ML Insights tab
+- Selects “Comparison Mode”
+- Views two side-by-side charts: Historical Actuals vs. Predicted Risk
+- Switches view by clicking filters for State = “Sabah”
+- Downloads the graph or underlying JSON data
+
+**Output:**  
+Visual and exportable comparison between observed and predicted data
+
+---
+
+## 4. Port Authority Representative – Respond to Local Pollution Event
+
+"As an officer from the Penang Port Commission, I want to log a plastic pollution observation made by one of our patrol boats, so the report is recorded and visualized on the map even though no cleanup happened."
+
+**Steps:**
+- Goes to the “Report Observation” page
+- Fills out observer name, date, location (pin or dropdown), and pollution type
+- Submits the entry → Receives thank-you confirmation
+- Later sees the observation appear as a marker on the heatmap (optional toggle)
+
+**Output:**  
+Logged field-based pollution event added to dashboard insights
+
+---
+
+## 5. Internal Admin – Simulate Monsoon Season Shift
+
+"As a DebriSense admin or ML tester, I want to switch between Northeast and Southwest monsoon simulation to see how predictions vary, so I can QA the seasonal logic and visual accuracy."
+
+**Steps:**
+- Opens the “Admin Panel”
+- Clicks a dropdown to select “Southwest Monsoon”
+- Heatmap and charts refresh based on mock prediction values
+- Downloads test output for verification
+
+**Output:**  
+Simulated seasonal risk data shown across all modules
+
+---
+
+## Notes to Cursor:
+
+- These user stories describe real-world actors using the system.
+- Use them to inform:
+  - Which **pages** to generate
+  - Where to add **filters**, **forms**, **charts**, and **export** buttons
+  - What kind of **placeholder/mock behavior** to simulate
+- Actions like “click”, “select filter”, or “submit form” should exist in UI
+- All back-end logic is simulated for now — use static mock data where needed
+
