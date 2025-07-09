@@ -109,6 +109,12 @@ function initializeEnhancedMap() {
         addMapLegend();
         addInfoPanel();
         
+        // Add zoom event listener to update polygon sizes and heatmap
+        map.on('zoomend', function() {
+            updatePolygonSizes();
+            updateHeatmapSize();
+        });
+        
         console.log('✅ Enhanced map initialized successfully');
     } catch (error) {
         console.error('❌ Enhanced map initialization failed:', error);
@@ -152,10 +158,14 @@ function createHeatmapOverlay() {
             map.removeLayer(heatmapLayer);
         }
         
-        // Create new heatmap layer
+        // Create much smaller, more precise heatmap
+        const zoomLevel = map.getZoom();
+        const heatmapRadius = Math.max(8, 25 - (zoomLevel - 6) * 3); // Much smaller radius
+        const heatmapBlur = Math.max(4, 15 - (zoomLevel - 6) * 2); // Much smaller blur
+        
         heatmapLayer = L.heatLayer(heatmapData, {
-            radius: 50,
-            blur: 30,
+            radius: heatmapRadius, // Much smaller radius
+            blur: heatmapBlur, // Much smaller blur
             maxZoom: 10,
             gradient: {
                 0.0: '#A5D6A7', // Green for low risk
@@ -173,7 +183,123 @@ function createHeatmapOverlay() {
     }
 }
 
-// Create clickable region polygons
+// Create precise river basin shapes based on actual river geography
+function createRiverBasinShape(centerLat, centerLng, baseSize, riverName) {
+    // Define specific river basin shapes for major Malaysian rivers
+    const riverShapes = {
+        'Sungai Klang': {
+            // Klang River - follows the river course from KL to Port Klang
+            points: [
+                [centerLat - 0.1, centerLng - 0.05],
+                [centerLat - 0.08, centerLng - 0.03],
+                [centerLat - 0.05, centerLng - 0.02],
+                [centerLat - 0.02, centerLng - 0.01],
+                [centerLat, centerLng],
+                [centerLat + 0.02, centerLng + 0.01],
+                [centerLat + 0.05, centerLng + 0.02],
+                [centerLat + 0.08, centerLng + 0.03],
+                [centerLat + 0.1, centerLng + 0.05],
+                [centerLat + 0.08, centerLng + 0.08],
+                [centerLat + 0.05, centerLng + 0.1],
+                [centerLat, centerLng + 0.12],
+                [centerLat - 0.05, centerLng + 0.1],
+                [centerLat - 0.08, centerLng + 0.08],
+                [centerLat - 0.1, centerLng + 0.05]
+            ],
+            scale: 0.8
+        },
+        'Sungai Pinang': {
+            // Penang River - follows the river in Penang
+            points: [
+                [centerLat - 0.05, centerLng - 0.03],
+                [centerLat - 0.03, centerLng - 0.02],
+                [centerLat - 0.01, centerLng - 0.01],
+                [centerLat, centerLng],
+                [centerLat + 0.01, centerLng + 0.01],
+                [centerLat + 0.03, centerLng + 0.02],
+                [centerLat + 0.05, centerLng + 0.03],
+                [centerLat + 0.03, centerLng + 0.05],
+                [centerLat, centerLng + 0.06],
+                [centerLat - 0.03, centerLng + 0.05],
+                [centerLat - 0.05, centerLng + 0.03]
+            ],
+            scale: 0.6
+        },
+        'Sungai Perak': {
+            // Perak River - longer river basin
+            points: [
+                [centerLat - 0.15, centerLng - 0.08],
+                [centerLat - 0.12, centerLng - 0.05],
+                [centerLat - 0.08, centerLng - 0.03],
+                [centerLat - 0.04, centerLng - 0.01],
+                [centerLat, centerLng],
+                [centerLat + 0.04, centerLng + 0.01],
+                [centerLat + 0.08, centerLng + 0.03],
+                [centerLat + 0.12, centerLng + 0.05],
+                [centerLat + 0.15, centerLng + 0.08],
+                [centerLat + 0.12, centerLng + 0.12],
+                [centerLat + 0.08, centerLng + 0.15],
+                [centerLat, centerLng + 0.18],
+                [centerLat - 0.08, centerLng + 0.15],
+                [centerLat - 0.12, centerLng + 0.12],
+                [centerLat - 0.15, centerLng + 0.08]
+            ],
+            scale: 1.0
+        },
+        'Sungai Johor': {
+            // Johor River - southern river basin
+            points: [
+                [centerLat - 0.08, centerLng - 0.04],
+                [centerLat - 0.06, centerLng - 0.02],
+                [centerLat - 0.03, centerLng - 0.01],
+                [centerLat, centerLng],
+                [centerLat + 0.03, centerLng + 0.01],
+                [centerLat + 0.06, centerLng + 0.02],
+                [centerLat + 0.08, centerLng + 0.04],
+                [centerLat + 0.06, centerLng + 0.06],
+                [centerLat, centerLng + 0.08],
+                [centerLat - 0.06, centerLng + 0.06],
+                [centerLat - 0.08, centerLng + 0.04]
+            ],
+            scale: 0.7
+        }
+    };
+    
+    const riverConfig = riverShapes[riverName];
+    if (!riverConfig) {
+        // For rivers without specific shapes, create a small, precise oval
+        return createPreciseOval(centerLat, centerLng, baseSize * 0.3);
+    }
+    
+    // Scale the river shape based on zoom and river size
+    const zoomLevel = map.getZoom();
+    const zoomFactor = Math.max(0.1, 1 - (zoomLevel - 6) * 0.15);
+    const finalScale = riverConfig.scale * zoomFactor;
+    
+    return riverConfig.points.map(point => [
+        centerLat + (point[0] * finalScale),
+        centerLng + (point[1] * finalScale)
+    ]);
+}
+
+// Create precise oval shape for smaller areas
+function createPreciseOval(centerLat, centerLng, size) {
+    const points = [];
+    const numPoints = 12;
+    const latRadius = size / 111000; // Convert to degrees
+    const lngRadius = size / (111000 * Math.cos(centerLat * Math.PI / 180));
+    
+    for (let i = 0; i < numPoints; i++) {
+        const angle = (i / numPoints) * 2 * Math.PI;
+        const lat = centerLat + (latRadius * Math.cos(angle));
+        const lng = centerLng + (lngRadius * Math.sin(angle));
+        points.push([lat, lng]);
+    }
+    
+    return points;
+}
+
+// Create clickable region polygons with overlap prevention
 function createRegionPolygons() {
     // Clear existing polygons
     regionPolygons.forEach(polygon => {
@@ -183,23 +309,48 @@ function createRegionPolygons() {
     
     const filteredZones = getFilteredZones();
     
-    filteredZones.forEach(zone => {
+    // Group nearby zones to prevent overlap
+    const groupedZones = groupNearbyZones(filteredZones);
+    
+    groupedZones.forEach(zone => {
         const coordinates = getZoneCoordinates(zone);
         if (!coordinates) return;
         
-        // Create polygon bounds
-        const bounds = [
-            [coordinates[0][0], coordinates[0][1]],
-            [coordinates[1][0], coordinates[1][1]]
-        ];
+        // Use combined zone center if available
+        const centerLat = zone.center_lat || (coordinates[0][0] + coordinates[1][0]) / 2;
+        const centerLng = zone.center_lng || (coordinates[0][1] + coordinates[1][1]) / 2;
+        const latDiff = Math.abs(coordinates[1][0] - coordinates[0][0]);
+        const lngDiff = Math.abs(coordinates[1][1] - coordinates[0][1]);
         
-        // Create rectangle polygon
-        const polygon = L.rectangle(bounds, {
-            color: getRiskColor(zone.predicted_risk_score),
-            weight: 2,
-            fillColor: getRiskColor(zone.predicted_risk_score),
-            fillOpacity: 0.3
-        });
+        // Create much smaller, more precise boundaries
+        const zoomLevel = map.getZoom();
+        const zoomFactor = Math.max(0.05, 1 - (zoomLevel - 6) * 0.2); // Even more aggressive scaling
+        const baseSize = Math.min(latDiff, lngDiff) * 10000; // Much smaller base size
+        const adjustedSize = baseSize * zoomFactor;
+        
+        // Create precise river basin shapes
+        const riverShape = createRiverBasinShape(centerLat, centerLng, adjustedSize, zone.river_basin);
+        
+        let polygon;
+        if (riverShape) {
+            // Use precise river basin shape
+            polygon = L.polygon(riverShape, {
+                color: getRiskColor(zone.predicted_risk_score),
+                weight: 1.5,
+                fillColor: getRiskColor(zone.predicted_risk_score),
+                fillOpacity: 0.5
+            });
+        } else {
+            // Fallback to very small circle
+            const smallRadius = Math.max(2000, adjustedSize * 0.2); // Very small circles
+            polygon = L.circle([centerLat, centerLng], {
+                radius: smallRadius,
+                color: getRiskColor(zone.predicted_risk_score),
+                weight: 1.5,
+                fillColor: getRiskColor(zone.predicted_risk_score),
+                fillOpacity: 0.5
+            });
+        }
         
         // Add click handler
         polygon.on('click', function() {
@@ -221,17 +372,27 @@ function createRegionPolygons() {
             });
         });
         
-        // Add tooltip
-        polygon.bindTooltip(`
-            <div class="zone-tooltip">
+        // Add tooltip with combined zone info
+        const tooltipContent = zone.combined_zones ? 
+            `<div class="zone-tooltip">
+                <strong>${zone.river_basin}</strong><br>
+                <span class="risk-score ${getRiskClass(zone.predicted_risk_score)}">
+                    ${(zone.predicted_risk_score * 100).toFixed(1)}% Risk
+                </span><br>
+                <small>Combined: ${zone.combined_zones.length} zones</small><br>
+                <small>State: ${zone.state}</small><br>
+                <small>Click for detailed insights</small>
+            </div>` :
+            `<div class="zone-tooltip">
                 <strong>${zone.river_basin}</strong><br>
                 <span class="risk-score ${getRiskClass(zone.predicted_risk_score)}">
                     ${(zone.predicted_risk_score * 100).toFixed(1)}% Risk
                 </span><br>
                 <small>State: ${zone.state}</small><br>
                 <small>Click for detailed insights</small>
-            </div>
-        `, {
+            </div>`;
+        
+        polygon.bindTooltip(tooltipContent, {
             permanent: false,
             direction: 'top',
             className: 'zone-tooltip'
@@ -418,26 +579,45 @@ function addInfoPanel() {
         div.innerHTML = `
             <strong>DebriSense</strong><br>
             <small>Data: ${mockData.mlPredictionZones.length} zones</small><br>
-            <small>Updated: ${new Date().toLocaleDateString()}</small>
+            <small>Updated: ${new Date().toLocaleDateString()}</small><br>
+            <small id="zoom-info">Zoom: <span id="zoom-level">6</span> | Shapes: <span id="shape-scale">100%</span></small>
         `;
         return div;
     };
     
     infoPanel.addTo(map);
+    
+    // Update zoom info when zoom changes
+    map.on('zoomend', function() {
+        const zoomLevel = map.getZoom();
+        const zoomFactor = Math.max(0.3, 1 - (zoomLevel - 6) * 0.1);
+        const scalePercent = Math.round(zoomFactor * 100);
+        
+        const zoomLevelElement = document.getElementById('zoom-level');
+        const shapeScaleElement = document.getElementById('shape-scale');
+        
+        if (zoomLevelElement) zoomLevelElement.textContent = zoomLevel;
+        if (shapeScaleElement) shapeScaleElement.textContent = `${scalePercent}%`;
+    });
 }
 
 // Show region details in enhanced modal
 function showRegionDetails(zone) {
     console.log('📊 Showing region details for:', zone.river_basin);
     
+    // Handle combined zones
+    const zonesToCheck = zone.combined_zones || [zone];
+    const allRivers = zonesToCheck.map(z => z.river_basin);
+    const allStates = zonesToCheck.map(z => z.state);
+    
     // Get recent cleanup reports for this region
     const recentReports = mockData.cleanupReports.filter(report => 
-        report.state === zone.state || report.river === zone.river_basin
+        allStates.includes(report.state) || allRivers.includes(report.river)
     ).slice(0, 3);
     
     // Get pollution observations for this region
     const observations = mockData.pollutionObservations.filter(obs => 
-        obs.state === zone.state || obs.river === zone.river_basin
+        allStates.includes(obs.state) || allRivers.includes(obs.river)
     ).slice(0, 2);
     
     const modalContent = `
@@ -453,6 +633,12 @@ function showRegionDetails(zone) {
                         <td><strong>State:</strong></td>
                         <td>${zone.state}</td>
                     </tr>
+                    ${zone.combined_zones ? `
+                    <tr>
+                        <td><strong>Combined Zones:</strong></td>
+                        <td>${zone.combined_zones.length} areas</td>
+                    </tr>
+                    ` : ''}
                     <tr>
                         <td><strong>Season:</strong></td>
                         <td>${zone.season}</td>
@@ -670,11 +856,11 @@ function showMapLegend() {
         <div class="row">
             <div class="col-md-6">
                 <h6><i class="fas fa-fire me-2"></i>Heatmap Overlay</h6>
-                <p class="small text-muted">Colored zones show pollution risk intensity across Malaysia</p>
+                <p class="small text-muted">Organic shapes show pollution risk intensity across Malaysia</p>
             </div>
             <div class="col-md-6">
                 <h6><i class="fas fa-map-marker-alt me-2"></i>Clickable Regions</h6>
-                <p class="small text-muted">Click on zones for detailed insights and cleanup data</p>
+                <p class="small text-muted">Click on organic zones for detailed insights and cleanup data</p>
             </div>
         </div>
         <hr>
@@ -711,6 +897,201 @@ function viewRegionInsights() {
         });
         window.location.href = `insights.html?${params.toString()}`;
     }
+}
+
+// Update polygon sizes based on zoom level
+function updatePolygonSizes() {
+    if (!map || regionPolygons.length === 0) return;
+    
+    const zoomLevel = map.getZoom();
+    const zoomFactor = Math.max(0.3, 1 - (zoomLevel - 6) * 0.1); // Scale down as zoom increases
+    
+    console.log(`🔄 Updating polygon sizes for zoom level ${zoomLevel} (factor: ${zoomFactor.toFixed(2)})`);
+    
+    // Get the original filtered zones to recalculate sizes
+    const filteredZones = getFilteredZones();
+    
+    regionPolygons.forEach((polygon, index) => {
+        if (!polygon || index >= filteredZones.length) return;
+        
+        const zone = filteredZones[index];
+        const coordinates = getZoneCoordinates(zone);
+        if (!coordinates) return;
+        
+        // Calculate center point and base radius
+        const centerLat = (coordinates[0][0] + coordinates[1][0]) / 2;
+        const centerLng = (coordinates[0][1] + coordinates[1][1]) / 2;
+        const latDiff = Math.abs(coordinates[1][0] - coordinates[0][0]);
+        const lngDiff = Math.abs(coordinates[1][1] - coordinates[0][1]);
+        const baseRadius = Math.max(latDiff, lngDiff) * 50000;
+        const adjustedRadius = baseRadius * zoomFactor;
+        
+        // Update polygon size based on its type
+        if (polygon.getRadius) {
+            // It's a circle - make it much smaller
+            const smallRadius = Math.max(5000, adjustedSize * 0.3);
+            polygon.setRadius(smallRadius);
+        } else {
+            // It's a polygon - recreate it with new river basin shape
+            const riverShape = createRiverBasinShape(centerLat, centerLng, adjustedSize, zone.river_basin);
+            const newPolygon = L.polygon(riverShape, {
+                color: getRiskColor(zone.predicted_risk_score),
+                weight: 1.5,
+                fillColor: getRiskColor(zone.predicted_risk_score),
+                fillOpacity: 0.4
+            });
+            
+            // Copy event handlers from old polygon
+            if (polygon._events) {
+                Object.keys(polygon._events).forEach(eventType => {
+                    polygon._events[eventType].forEach(handler => {
+                        newPolygon.on(eventType, handler.fn);
+                    });
+                });
+            }
+            
+            // Replace old polygon with new one
+            map.removeLayer(polygon);
+            newPolygon.addTo(map);
+            regionPolygons[index] = newPolygon;
+        }
+    });
+    
+    console.log(`✅ Updated ${regionPolygons.length} polygon sizes`);
+}
+
+// Update heatmap size based on zoom level
+function updateHeatmapSize() {
+    if (!map || !heatmapLayer) return;
+    
+    const zoomLevel = map.getZoom();
+    const heatmapRadius = Math.max(8, 25 - (zoomLevel - 6) * 3); // Much smaller radius
+    const heatmapBlur = Math.max(4, 15 - (zoomLevel - 6) * 2); // Much smaller blur
+    
+    console.log(`🔥 Updating heatmap size for zoom level ${zoomLevel} (radius: ${heatmapRadius}, blur: ${heatmapBlur})`);
+    
+    // Remove current heatmap and recreate with new size
+    map.removeLayer(heatmapLayer);
+    
+    // Get filtered data
+    const filteredZones = getFilteredZones();
+    
+    // Convert zones to heatmap data points
+    const heatmapData = filteredZones.map(zone => {
+        const coordinates = getZoneCoordinates(zone);
+        if (!coordinates) return null;
+        
+        // Calculate center point
+        const centerLat = (coordinates[0][0] + coordinates[1][0]) / 2;
+        const centerLng = (coordinates[0][1] + coordinates[1][1]) / 2;
+        
+        return {
+            lat: centerLat,
+            lng: centerLng,
+            intensity: zone.predicted_risk_score
+        };
+    }).filter(point => point !== null);
+    
+    // Create new heatmap layer with updated size
+    heatmapLayer = L.heatLayer(heatmapData, {
+        radius: heatmapRadius,
+        blur: heatmapBlur,
+        maxZoom: 10,
+        gradient: {
+            0.0: '#A5D6A7', // Green for low risk
+            0.3: '#A5D6A7',
+            0.31: '#FFF176', // Yellow for moderate risk
+            0.6: '#FFF176',
+            0.61: '#EF5350', // Red for high risk
+            1.0: '#EF5350'
+        }
+    }).addTo(map);
+    
+    console.log(`✅ Updated heatmap size`);
+}
+
+// Group nearby zones to prevent overlap
+function groupNearbyZones(zones) {
+    const grouped = [];
+    const processed = new Set();
+    
+    zones.forEach((zone, index) => {
+        if (processed.has(index)) return;
+        
+        const coordinates = getZoneCoordinates(zone);
+        if (!coordinates) return;
+        
+        const centerLat = (coordinates[0][0] + coordinates[1][0]) / 2;
+        const centerLng = (coordinates[0][1] + coordinates[1][1]) / 2;
+        
+        // Find nearby zones (within 0.1 degrees)
+        const nearbyZones = [zone];
+        const nearbyIndices = [index];
+        
+        zones.forEach((otherZone, otherIndex) => {
+            if (otherIndex === index || processed.has(otherIndex)) return;
+            
+            const otherCoordinates = getZoneCoordinates(otherZone);
+            if (!otherCoordinates) return;
+            
+            const otherCenterLat = (otherCoordinates[0][0] + otherCoordinates[1][0]) / 2;
+            const otherCenterLng = (otherCoordinates[0][1] + otherCoordinates[1][1]) / 2;
+            
+            const distance = Math.sqrt(
+                Math.pow(centerLat - otherCenterLat, 2) + 
+                Math.pow(centerLng - otherCenterLng, 2)
+            );
+            
+            if (distance < 0.1) { // 0.1 degrees threshold
+                nearbyZones.push(otherZone);
+                nearbyIndices.push(otherIndex);
+            }
+        });
+        
+        // Mark all nearby zones as processed
+        nearbyIndices.forEach(i => processed.add(i));
+        
+        // If multiple zones are nearby, create a combined zone
+        if (nearbyZones.length > 1) {
+            const combinedZone = createCombinedZone(nearbyZones);
+            grouped.push(combinedZone);
+        } else {
+            grouped.push(zone);
+        }
+    });
+    
+    return grouped;
+}
+
+// Create a combined zone from multiple nearby zones
+function createCombinedZone(zones) {
+    // Calculate average center and highest risk score
+    let totalLat = 0, totalLng = 0, maxRisk = 0;
+    let allRivers = [];
+    
+    zones.forEach(zone => {
+        const coordinates = getZoneCoordinates(zone);
+        if (coordinates) {
+            const centerLat = (coordinates[0][0] + coordinates[1][0]) / 2;
+            const centerLng = (coordinates[0][1] + coordinates[1][1]) / 2;
+            totalLat += centerLat;
+            totalLng += centerLng;
+        }
+        maxRisk = Math.max(maxRisk, zone.predicted_risk_score);
+        allRivers.push(zone.river_basin);
+    });
+    
+    const avgLat = totalLat / zones.length;
+    const avgLng = totalLng / zones.length;
+    
+    return {
+        ...zones[0], // Use first zone as template
+        river_basin: allRivers.join(' + '),
+        predicted_risk_score: maxRisk,
+        combined_zones: zones,
+        center_lat: avgLat,
+        center_lng: avgLng
+    };
 }
 
 // Cleanup function to destroy map

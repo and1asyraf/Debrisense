@@ -71,7 +71,7 @@ Malaysia faces a growing marine plastic crisis — with plastic waste leaking fr
 - Focused on rivers that flow into the sea (major catchments)
 - Supports zoom & analysis by state, district, and river basin
 
----
+--- 
 
 ## 🧩 Why DebriSense Is Unique
 - Most competing ideas use **real-time IoT sensors** or **floating devices**

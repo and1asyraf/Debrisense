@@ -586,6 +586,40 @@ h6 { font-size: 12px; }
     position: relative;
 }
 
+/* Organic map shapes styling */
+.leaflet-interactive {
+    transition: all 0.1s ease;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.1));
+    cursor: pointer;
+}
+
+.leaflet-interactive:hover {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+    z-index: 999 !important;
+}
+
+/* Improve tooltip visibility */
+.zone-tooltip {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid #ddd !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    font-size: 12px !important;
+    padding: 8px !important;
+}
+
+/* Improve interaction when zooming */
+.leaflet-zoom-animated {
+    transition: all 0.2s ease;
+}
+
+/* Make circles and polygons look more organic */
+.leaflet-overlay-pane svg path,
+.leaflet-overlay-pane svg circle {
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
 /* Filter Sidebar Styles */
 .filter-sidebar {
     height: calc(100vh - 120px);
