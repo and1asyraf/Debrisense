@@ -134,6 +134,31 @@ h6 { font-size: 12px; }
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Equal height cards for dashboard filters and stats */
+.equal-height-row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.equal-height-row > .col-md-8,
+.equal-height-row > .col-md-4 {
+    display: flex;
+    flex-direction: column;
+}
+
+.equal-height-row .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+
+.equal-height-row .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-medium);

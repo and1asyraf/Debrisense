@@ -133,6 +133,7 @@ function createRiverMarkers() {
     
     console.log(`📍 Creating ${filteredRivers.length} river markers`);
     console.log('Filtered rivers:', filteredRivers.map(r => r.name));
+    console.log('Current dashboard filters:', dashboardFilters);
     
     filteredRivers.forEach(river => {
         try {
@@ -194,18 +195,37 @@ function clearRiverMarkers() {
 
 // Filter rivers based on current dashboard filters
 function filterRivers(riverData) {
+    console.log('🔍 Filtering rivers...');
+    console.log('Current filters:', dashboardFilters);
+    console.log('Total rivers before filtering:', riverData.length);
+    
     let filtered = riverData;
     
     // Filter by state
     if (dashboardFilters.state) {
-        filtered = filtered.filter(river => river.state === dashboardFilters.state);
+        console.log(`Filtering by state: "${dashboardFilters.state}"`);
+        const beforeStateFilter = filtered.length;
+        filtered = filtered.filter(river => {
+            const matches = river.state === dashboardFilters.state;
+            console.log(`River ${river.name} (${river.state}) matches state filter: ${matches}`);
+            return matches;
+        });
+        console.log(`After state filter: ${beforeStateFilter} -> ${filtered.length} rivers`);
     }
     
     // Filter by river name
     if (dashboardFilters.river) {
-        filtered = filtered.filter(river => river.name === dashboardFilters.river);
+        console.log(`Filtering by river: "${dashboardFilters.river}"`);
+        const beforeRiverFilter = filtered.length;
+        filtered = filtered.filter(river => {
+            const matches = river.name === dashboardFilters.river;
+            console.log(`River ${river.name} matches river filter: ${matches}`);
+            return matches;
+        });
+        console.log(`After river filter: ${beforeRiverFilter} -> ${filtered.length} rivers`);
     }
     
+    console.log('Final filtered rivers:', filtered.map(r => r.name));
     return filtered;
 }
 
@@ -451,7 +471,7 @@ function getRecentActivities(riverName) {
     const reports = mockData.cleanupReports.filter(report => report.river === riverName);
     return reports.slice(0, 3).map(report => ({
         title: `Cleanup at ${report.location}`,
-        details: `${getTotalItems(report.plastic_items)} items collected by ${report.submitted_by}`,
+        details: `${getTotalItems(report.plastic_items)} kg collected by ${report.submitted_by}`,
         date: new Date(report.date).toLocaleDateString()
     }));
 }
@@ -742,32 +762,47 @@ function setupFilterListeners() {
     document.getElementById('stateFilter').addEventListener('change', function() {
         dashboardFilters.state = this.value;
         updateFilterStatus();
+        applyMapFilters(); // Apply filters immediately when state changes
     });
     
     // River filter
     document.getElementById('riverFilter').addEventListener('change', function() {
         dashboardFilters.river = this.value;
         updateFilterStatus();
+        applyMapFilters(); // Apply filters immediately when river changes
     });
     
     // Pollution type filters
-    const pollutionCheckboxes = ['plasticBottles', 'plasticBags', 'foodWrappers', 'straws', 'fishingGear', 'others'];
+    const pollutionCheckboxes = ['plasticBottles', 'plasticBags', 'foodWrappers', 'straws', 'cigaretteButts', 'fishingGear'];
     pollutionCheckboxes.forEach(id => {
-        document.getElementById(id).addEventListener('change', function() {
-            updatePollutionTypeFilters();
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('change', function() {
+                updatePollutionTypeFilters();
+                applyMapFilters(); // Apply filters immediately when pollution types change
+            });
+        }
+    });
+    
+    // Date filters (if they exist)
+    const startDateElement = document.getElementById('startDate');
+    const endDateElement = document.getElementById('endDate');
+    
+    if (startDateElement) {
+        startDateElement.addEventListener('change', function() {
+            dashboardFilters.startDate = this.value;
+            updateFilterStatus();
+            applyMapFilters(); // Apply filters immediately when date changes
         });
-    });
+    }
     
-    // Date filters
-    document.getElementById('startDate').addEventListener('change', function() {
-        dashboardFilters.startDate = this.value;
-        updateFilterStatus();
-    });
-    
-    document.getElementById('endDate').addEventListener('change', function() {
-        dashboardFilters.endDate = this.value;
-        updateFilterStatus();
-    });
+    if (endDateElement) {
+        endDateElement.addEventListener('change', function() {
+            dashboardFilters.endDate = this.value;
+            updateFilterStatus();
+            applyMapFilters(); // Apply filters immediately when date changes
+        });
+    }
 }
 
 // Update pollution type filters
@@ -779,12 +814,13 @@ function updatePollutionTypeFilters() {
         'plasticBags': 'Plastic Bags',
         'foodWrappers': 'Food Wrappers',
         'straws': 'Straws',
-        'fishingGear': 'Fishing Gear',
-        'others': 'Others'
+        'cigaretteButts': 'Cigarette Butts',
+        'fishingGear': 'Fishing Gear'
     };
     
     Object.keys(pollutionTypes).forEach(id => {
-        if (document.getElementById(id).checked) {
+        const element = document.getElementById(id);
+        if (element && element.checked) {
             dashboardFilters.pollutionTypes.push(pollutionTypes[id]);
         }
     });
@@ -829,10 +865,58 @@ function applyMapFilters() {
         console.log('✅ Map filters applied successfully');
         
         // Show notification
-        DebriSense.showNotification('Map updated with new filters', 'success');
+        if (typeof DebriSense !== 'undefined' && DebriSense.showNotification) {
+            DebriSense.showNotification('Map updated with new filters', 'success');
+        }
     } catch (error) {
         console.error('❌ Failed to apply map filters:', error);
-        DebriSense.showNotification('Failed to apply filters', 'error');
+        if (typeof DebriSense !== 'undefined' && DebriSense.showNotification) {
+            DebriSense.showNotification('Failed to apply filters', 'error');
+        }
+    }
+}
+
+// Clear all filters
+function clearFilters() {
+    console.log('🧹 Clearing all filters...');
+    
+    try {
+        // Reset filter values
+        dashboardFilters.state = '';
+        dashboardFilters.river = '';
+        dashboardFilters.pollutionTypes = ['Plastic Bottles', 'Plastic Bags', 'Food Wrappers', 'Straws', 'Cigarette Butts', 'Fishing Gear'];
+        
+        // Reset form elements
+        const stateFilter = document.getElementById('stateFilter');
+        const riverFilter = document.getElementById('riverFilter');
+        
+        if (stateFilter) stateFilter.value = '';
+        if (riverFilter) riverFilter.value = '';
+        
+        // Reset pollution type checkboxes
+        const pollutionTypes = ['plasticBottles', 'plasticBags', 'foodWrappers', 'straws', 'cigaretteButts', 'fishingGear'];
+        pollutionTypes.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.checked = true;
+        });
+        
+        // Update filter status
+        updateFilterStatus();
+        
+        // Apply cleared filters to map
+        applyMapFilters();
+        
+        console.log('✅ All filters cleared successfully');
+        
+        // Show notification
+        if (typeof DebriSense !== 'undefined' && DebriSense.showNotification) {
+            DebriSense.showNotification('All filters cleared', 'info');
+        }
+    } catch (error) {
+        console.error('❌ Failed to clear filters:', error);
+        if (typeof DebriSense !== 'undefined' && DebriSense.showNotification) {
+            DebriSense.showNotification('Failed to clear filters', 'error');
+        }
     }
 }
 
@@ -1091,9 +1175,11 @@ function getProgressBarClass(riskScore) {
     return 'bg-danger';
 }
 
-// Get total items from plastic items object
+// Get total kilograms from plastic items object
 function getTotalItems(plasticItems) {
-    return Object.values(plasticItems).reduce((sum, count) => sum + count, 0);
+    // Convert items to kilograms (assuming each item is roughly 0.1 kg on average)
+    const totalItems = Object.values(plasticItems).reduce((sum, count) => sum + count, 0);
+    return (totalItems * 0.1).toFixed(1); // Convert to kg with 1 decimal place
 }
 
 // Update dashboard stats
@@ -1105,12 +1191,28 @@ function updateDashboardStats() {
         return true;
     });
     
-    // Update stats
-    document.getElementById('totalZones').textContent = filteredZones.length;
-    document.getElementById('totalReports').textContent = filteredReports.length;
-    document.getElementById('dataPoints').textContent = `${filteredZones.length} zones`;
-    document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-    document.getElementById('currentSeason').textContent = 'Northeast Monsoon';
+    // Calculate high risk zones
+    const highRiskZones = filteredZones.filter(zone => zone.predicted_risk_score >= 0.6).length;
+    
+    // Calculate average risk score
+    const avgRiskScore = filteredZones.length > 0 
+        ? (filteredZones.reduce((sum, zone) => sum + zone.predicted_risk_score, 0) / filteredZones.length * 100).toFixed(1)
+        : '0.0';
+    
+    // Update stats - only update elements that exist
+    const totalReportsElement = document.getElementById('totalReports');
+    const avgRiskScoreElement = document.getElementById('avgRiskScore');
+    const highRiskZonesElement = document.getElementById('highRiskZones');
+    const lastUpdatedElement = document.getElementById('lastUpdated');
+    const currentSeasonElement = document.getElementById('currentSeason');
+    const dataPointsElement = document.getElementById('dataPoints');
+    
+    if (totalReportsElement) totalReportsElement.textContent = filteredReports.length;
+    if (avgRiskScoreElement) avgRiskScoreElement.textContent = avgRiskScore;
+    if (highRiskZonesElement) highRiskZonesElement.textContent = highRiskZones;
+    if (lastUpdatedElement) lastUpdatedElement.textContent = new Date().toLocaleString();
+    if (currentSeasonElement) currentSeasonElement.textContent = 'Northeast Monsoon';
+    if (dataPointsElement) dataPointsElement.textContent = `${filteredZones.length} zones`;
     
     // Update console with data summary
     console.log(`📊 Dashboard Stats: ${filteredZones.length} zones, ${filteredReports.length} cleanup reports, ${mockData.pollutionObservations.length} observations`);
@@ -1136,7 +1238,9 @@ function exportMapData() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    DebriSense.showNotification('Map data exported successfully', 'success');
+    if (typeof DebriSense !== 'undefined' && DebriSense.showNotification) {
+        DebriSense.showNotification('Map data exported successfully', 'success');
+    }
 }
 
 // Show map legend
@@ -1520,7 +1624,7 @@ function addCleanupReportMarker(report) {
     const popupHtml = `
         <div class="cleanup-popup">
             <h6><i class="fas fa-hands-helping"></i> ${report.location}</h6>
-            <p><strong>Total Items:</strong> ${report.total_items}</p>
+                         <p><strong>Total Weight:</strong> ${report.total_items} kg</p>
             <p><strong>Plastic Bottles:</strong> ${report.plastic_items.plastic_bottles}</p>
             <p><strong>Plastic Bags:</strong> ${report.plastic_items.plastic_bags}</p>
             <p><strong>Food Wrappers:</strong> ${report.plastic_items.food_wrappers}</p>
@@ -1778,7 +1882,9 @@ function exportRiverData() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    DebriSense.showNotification('River data exported successfully', 'success');
+    if (typeof DebriSense !== 'undefined' && DebriSense.showNotification) {
+        DebriSense.showNotification('River data exported successfully', 'success');
+    }
 }
 
 function viewPastReports() {
@@ -1793,7 +1899,7 @@ function viewPastReports() {
             <div class="activity-item">
                 <div class="activity-title">${report.location}</div>
                 <div class="activity-details">
-                    ${getTotalItems(report.plastic_items)} items collected by ${report.submitted_by}
+                                         ${getTotalItems(report.plastic_items)} kg collected by ${report.submitted_by}
                 </div>
                 <div class="activity-date">${new Date(report.date).toLocaleDateString()}</div>
             </div>
@@ -1854,7 +1960,9 @@ function submitReport() {
     // Reset form
     form.reset();
     
-    DebriSense.showNotification('Cleanup report submitted successfully!', 'success');
+    if (typeof DebriSense !== 'undefined' && DebriSense.showNotification) {
+        DebriSense.showNotification('Cleanup report submitted successfully!', 'success');
+    }
     
     // Refresh the current modal if it's open
     if (currentRiverData) {
@@ -1864,6 +1972,7 @@ function submitReport() {
 
 // Make functions globally available
 window.applyMapFilters = applyMapFilters;
+window.clearFilters = clearFilters;
 window.showRiverInsights = showRiverInsights;
 window.showChartOptions = showChartOptions;
 window.showPollutionBarChart = showPollutionBarChart;

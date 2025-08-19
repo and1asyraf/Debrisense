@@ -27,154 +27,9 @@
         <!-- Main Content -->
         <div class="content-wrapper">
             <div class="container-fluid">
+                <!-- Map Section -->
                 <div class="row">
-                    <!-- Filter Sidebar (Left Panel) -->
-                    <div class="col-md-3">
-                        <div class="filter-sidebar">
-                            <!-- DebriSense Sidebar with Filters -->
-                            <div class="sidebar">
-                                <h5 class="mb-3">
-                                    <i class="fas fa-filter me-2"></i>
-                                    Filters
-                                </h5>
-                                
-                                <!-- Season Filter -->
-                                <div class="filter-group">
-                                    <label class="form-label">Season</label>
-                                    <div class="btn-group w-100" role="group">
-                                        <input type="radio" class="btn-check" name="season" id="northeast" value="Northeast Monsoon" checked>
-                                        <label class="btn btn-outline-primary" for="northeast">Northeast</label>
-                                        
-                                        <input type="radio" class="btn-check" name="season" id="southwest" value="Southwest Monsoon">
-                                        <label class="btn btn-outline-primary" for="southwest">Southwest</label>
-                                    </div>
-                                </div>
-                                
-                                <!-- State Filter -->
-                                <div class="filter-group">
-                                    <label class="form-label">State</label>
-                                    <select class="form-select" id="stateFilter" aria-label="Filter by state">
-                                        <option value="">All States</option>
-                                        <option value="Selangor">Selangor</option>
-                                        <option value="Penang">Penang</option>
-                                        <option value="Sabah">Sabah</option>
-                                        <option value="Sarawak">Sarawak</option>
-                                        <option value="Johor">Johor</option>
-                                        <option value="Perak">Perak</option>
-                                        <option value="Kedah">Kedah</option>
-                                        <option value="Kelantan">Kelantan</option>
-                                        <option value="Terengganu">Terengganu</option>
-                                        <option value="Pahang">Pahang</option>
-                                        <option value="Negeri Sembilan">Negeri Sembilan</option>
-                                        <option value="Melaka">Melaka</option>
-                                        <option value="Perlis">Perlis</option>
-                                    </select>
-                                </div>
-                                
-                                <!-- River Filter -->
-                                <div class="filter-group">
-                                    <label class="form-label">River</label>
-                                    <select class="form-select" id="riverFilter" aria-label="Filter by river">
-                                        <option value="">All Rivers</option>
-                                        <option value="Sungai Klang">Sungai Klang</option>
-                                        <option value="Sungai Pinang">Sungai Pinang</option>
-                                        <option value="Sungai Petagas">Sungai Petagas</option>
-                                        <option value="Sungai Johor">Sungai Johor</option>
-                                        <option value="Sungai Linggi">Sungai Linggi</option>
-                                        <option value="Sungai Muar">Sungai Muar</option>
-                                        <option value="Sungai Pahang">Sungai Pahang</option>
-                                        <option value="Sungai Perak">Sungai Perak</option>
-                                        <option value="Sungai Muda">Sungai Muda</option>
-                                        <option value="Sungai Kelantan">Sungai Kelantan</option>
-                                        <option value="Sungai Terengganu">Sungai Terengganu</option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Pollution Type Filter -->
-                                <div class="filter-group">
-                                    <label class="form-label">Pollution Type</label>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="Plastic Bottles" id="plasticBottles" checked>
-                                        <label class="form-check-label" for="plasticBottles">
-                                            Plastic Bottles
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="Plastic Bags" id="plasticBags" checked>
-                                        <label class="form-check-label" for="plasticBags">
-                                            Plastic Bags
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="Food Wrappers" id="foodWrappers" checked>
-                                        <label class="form-check-label" for="foodWrappers">
-                                            Food Wrappers
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="Straws" id="straws" checked>
-                                        <label class="form-check-label" for="straws">
-                                            Straws
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="Cigarette Butts" id="cigaretteButts" checked>
-                                        <label class="form-check-label" for="cigaretteButts">
-                                            Cigarette Butts
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="Fishing Gear" id="fishingGear" checked>
-                                        <label class="form-check-label" for="fishingGear">
-                                            Fishing Gear
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <!-- Apply Filters Button -->
-                                <div class="filter-group">
-                                    <button class="btn btn-primary w-100 btn-apply-filters" id="applyFiltersBtn" onclick="applyFilters()">
-                                        <i class="fas fa-filter me-2"></i>
-                                        Apply Filters
-                                    </button>
-                                </div>
-                                
-                                <!-- Clear Filters Button -->
-                                <div class="filter-group">
-                                    <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
-                                        <i class="fas fa-times me-2"></i>
-                                        Clear Filters
-                                    </button>
-                                </div>
-                                
-                                <hr class="my-4">
-                                
-                                <!-- Quick Stats -->
-                                <h6 class="mb-3">
-                                    <i class="fas fa-chart-pie me-2"></i>
-                                    Quick Stats
-                                </h6>
-                                
-                                <div class="stats-card">
-                                    <div class="stats-number" id="totalReports">0</div>
-                                    <div class="stats-label">Total Reports</div>
-                                </div>
-                                
-                                <div class="stats-card">
-                                    <div class="stats-number" id="avgRiskScore">0.0</div>
-                                    <div class="stats-label">Avg Risk Score</div>
-                                </div>
-                                
-                                <div class="stats-card">
-                                    <div class="stats-number" id="highRiskZones">0</div>
-                                    <div class="stats-label">High Risk Zones</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Map View (Right Panel) -->
-                    <div class="col-md-9">
+                    <div class="col-12">
                         <!-- Map Header -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
@@ -212,67 +67,239 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Map Legend -->
-                        <div class="row mt-3">
-                            <div class="col-md-8">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6 class="mb-0">
-                                            <i class="fas fa-map-marker-alt me-2"></i>
-                                            Risk Legend
-                                        </h6>
+                    </div>
+                </div>
+                
+                <!-- Filters and Quick Stats Section (Below Map) -->
+                <div class="row mt-4 equal-height-row">
+                    <!-- Filters Column -->
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-filter me-2"></i>
+                                    Map Filters
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Season Filter -->
+                                    <div class="col-md-3">
+                                        <div class="filter-group">
+                                            <label class="form-label">Season</label>
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="season" id="northeast" value="Northeast Monsoon" checked>
+                                                <label class="btn btn-outline-primary" for="northeast">Northeast</label>
+                                                
+                                                <input type="radio" class="btn-check" name="season" id="southwest" value="Southwest Monsoon">
+                                                <label class="btn btn-outline-primary" for="southwest">Southwest</label>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-check-circle me-2 legend-icon-low"></i>
-                                                    <span>Low Risk (0.0 - 0.3)</span>
-                                                </div>
-                                                <small class="text-muted">Minimal pollution risk</small>
+                                    
+                                    <!-- State Filter -->
+                                    <div class="col-md-3">
+                                        <div class="filter-group">
+                                            <label class="form-label">State</label>
+                                            <select class="form-select" id="stateFilter" aria-label="Filter by state">
+                                                <option value="">All States</option>
+                                                <option value="Selangor">Selangor</option>
+                                                <option value="Penang">Penang</option>
+                                                <option value="Sabah">Sabah</option>
+                                                <option value="Sarawak">Sarawak</option>
+                                                <option value="Johor">Johor</option>
+                                                <option value="Perak">Perak</option>
+                                                <option value="Kedah">Kedah</option>
+                                                <option value="Kelantan">Kelantan</option>
+                                                <option value="Terengganu">Terengganu</option>
+                                                <option value="Pahang">Pahang</option>
+                                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                                <option value="Melaka">Melaka</option>
+                                                <option value="Perlis">Perlis</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- River Filter -->
+                                    <div class="col-md-3">
+                                        <div class="filter-group">
+                                            <label class="form-label">River</label>
+                                            <select class="form-select" id="riverFilter" aria-label="Filter by river">
+                                                <option value="">All Rivers</option>
+                                                <option value="Sungai Klang">Sungai Klang</option>
+                                                <option value="Sungai Pinang">Sungai Pinang</option>
+                                                <option value="Sungai Petagas">Sungai Petagas</option>
+                                                <option value="Sungai Johor">Sungai Johor</option>
+                                                <option value="Sungai Linggi">Sungai Linggi</option>
+                                                <option value="Sungai Muar">Sungai Muar</option>
+                                                <option value="Sungai Pahang">Sungai Pahang</option>
+                                                <option value="Sungai Perak">Sungai Perak</option>
+                                                <option value="Sungai Muda">Sungai Muda</option>
+                                                <option value="Sungai Kelantan">Sungai Kelantan</option>
+                                                <option value="Sungai Terengganu">Sungai Terengganu</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="col-md-3">
+                                        <div class="filter-group">
+                                            <label class="form-label">&nbsp;</label>
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-primary flex-fill" id="applyFiltersBtn" onclick="applyMapFilters()">
+                                                    <i class="fas fa-filter me-1"></i>
+                                                    Apply
+                                                </button>
+                                                <button class="btn btn-outline-secondary flex-fill" onclick="clearFilters()">
+                                                    <i class="fas fa-times me-1"></i>
+                                                    Clear
+                                                </button>
                                             </div>
-                                            <div class="col-md-4">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-exclamation-circle me-2 legend-icon-moderate"></i>
-                                                    <span>Moderate Risk (0.31 - 0.6)</span>
-                                                </div>
-                                                <small class="text-muted">Medium pollution risk</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Pollution Type Filter -->
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Pollution Type</label>
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="Plastic Bottles" id="plasticBottles" checked>
+                                                <label class="form-check-label" for="plasticBottles">
+                                                    Plastic Bottles
+                                                </label>
                                             </div>
-                                            <div class="col-md-4">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-exclamation-triangle me-2 legend-icon-high"></i>
-                                                    <span>High Risk (0.61 - 1.0)</span>
-                                                </div>
-                                                <small class="text-muted">High pollution risk</small>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="Plastic Bags" id="plasticBags" checked>
+                                                <label class="form-check-label" for="plasticBags">
+                                                    Plastic Bags
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="Food Wrappers" id="foodWrappers" checked>
+                                                <label class="form-check-label" for="foodWrappers">
+                                                    Food Wrappers
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="Straws" id="straws" checked>
+                                                <label class="form-check-label" for="straws">
+                                                    Straws
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="Cigarette Butts" id="cigaretteButts" checked>
+                                                <label class="form-check-label" for="cigaretteButts">
+                                                    Cigarette Butts
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="Fishing Gear" id="fishingGear" checked>
+                                                <label class="form-check-label" for="fishingGear">
+                                                    Fishing Gear
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6 class="mb-0">
-                                            <i class="fas fa-clock me-2"></i>
-                                            Last Updated
-                                        </h6>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats Column -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-chart-pie me-2"></i>
+                                    Quick Stats
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <div class="stats-card">
+                                            <div class="stats-number" id="totalReports">0</div>
+                                            <div class="stats-label">Total Reports</div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <p class="mb-1">
-                                            <strong>Predictions:</strong> 
-                                            <span id="lastUpdated">2024-10-15 10:30 AM</span>
-                                        </p>
-                                        <p class="mb-1">
-                                            <strong>Season:</strong> 
-                                            <span id="currentSeason">Northeast Monsoon</span>
-                                        </p>
-                                        <p class="mb-0">
-                                            <strong>Data Points:</strong> 
-                                            <span id="dataPoints">50 zones</span>
-                                        </p>
+                                    <div class="col-6 mb-3">
+                                        <div class="stats-card">
+                                            <div class="stats-number" id="avgRiskScore">0.0</div>
+                                            <div class="stats-label">Avg Risk Score</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="stats-card">
+                                            <div class="stats-number" id="highRiskZones">0</div>
+                                            <div class="stats-label">High Risk Zones</div>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map Legend and Info Section -->
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                    Risk Legend
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-check-circle me-2 legend-icon-low"></i>
+                                            <span>Low Risk (0.0 - 0.3)</span>
+                                        </div>
+                                        <small class="text-muted">Minimal pollution risk</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-exclamation-circle me-2 legend-icon-moderate"></i>
+                                            <span>Moderate Risk (0.31 - 0.6)</span>
+                                        </div>
+                                        <small class="text-muted">Medium pollution risk</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-exclamation-triangle me-2 legend-icon-high"></i>
+                                            <span>High Risk (0.61 - 1.0)</span>
+                                        </div>
+                                        <small class="text-muted">High pollution risk</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-clock me-2"></i>
+                                    Last Updated
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-1">
+                                    <strong>Predictions:</strong> 
+                                    <span id="lastUpdated">2024-10-15 10:30 AM</span>
+                                </p>
+                                <p class="mb-1">
+                                    <strong>Season:</strong> 
+                                    <span id="currentSeason">Northeast Monsoon</span>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Data Points:</strong> 
+                                    <span id="dataPoints">50 zones</span>
+                                </p>
                             </div>
                         </div>
                     </div>
