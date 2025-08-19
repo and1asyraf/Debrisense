@@ -1094,6 +1094,132 @@ function createCombinedZone(zones) {
     };
 }
 
+// Store placed marker positions to prevent overlap
+let placedMarkerPositions = [];
+
+function resetPlacedMarkerPositions() {
+    placedMarkerPositions = [];
+}
+
+function getNonOverlappingPosition(lat, lng, pixelRadius = 32) {
+    // Project lat/lng to pixel coordinates
+    if (!map) return [lat, lng];
+    const point = map.latLngToLayerPoint([lat, lng]);
+    let angle = 0;
+    let found = false;
+    let tries = 0;
+    let newPoint = point;
+    while (!found && tries < 10) {
+        found = true;
+        for (const placed of placedMarkerPositions) {
+            const dist = Math.sqrt(Math.pow(placed.x - newPoint.x, 2) + Math.pow(placed.y - newPoint.y, 2));
+            if (dist < pixelRadius) {
+                found = false;
+                break;
+            }
+        }
+        if (!found) {
+            // Offset in a small circle
+            angle += Math.PI / 4;
+            newPoint = L.point(
+                point.x + pixelRadius * Math.cos(angle),
+                point.y + pixelRadius * Math.sin(angle)
+            );
+        }
+        tries++;
+    }
+    placedMarkerPositions.push(newPoint);
+    // Convert back to lat/lng
+    const newLatLng = map.layerPointToLatLng(newPoint);
+    return [newLatLng.lat, newLatLng.lng];
+}
+
+// Utility to get risk class for marker
+function getRiskLevelClass(riskScore) {
+    if (riskScore >= 0.7) return 'risk-high';
+    if (riskScore >= 0.4) return 'risk-moderate';
+    return 'risk-low';
+}
+
+// Create a custom glowing marker with pulse, with de-overlap
+function createGlowingMarker(lat, lng, riskScore, popupHtml) {
+    const riskClass = getRiskLevelClass(riskScore);
+    const [adjLat, adjLng] = getNonOverlappingPosition(lat, lng, 32);
+    const markerHtml = `
+      <div class="glow-marker ${riskClass}">
+        <div class="pulse"></div>
+        <div class="dot"></div>
+      </div>
+    `;
+    const icon = L.divIcon({
+        className: 'custom-glow-marker',
+        html: markerHtml,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
+    });
+    const marker = L.marker([adjLat, adjLng], { icon });
+    if (popupHtml) marker.bindPopup(popupHtml);
+    marker.addTo(map);
+    return marker;
+}
+
+// Replace addSensorMarker to use glowing marker
+function addSensorMarker(reading) {
+    if (!map) return;
+    const riskClass = getRiskLevelClass(reading.risk_score);
+    const popupHtml = `
+        <div class="sensor-popup">
+            <h6><i class="fas fa-microchip"></i> ${reading.location}</h6>
+            <p><strong>Risk Score:</strong> ${(reading.risk_score * 100).toFixed(1)}%</p>
+            <p><strong>Plastic Concentration:</strong> ${reading.plastic_concentration.toFixed(1)} mg/L</p>
+            <p><strong>Water Turbidity:</strong> ${reading.water_turbidity.toFixed(1)} NTU</p>
+            <p><strong>Status:</strong> <span class="badge bg-${riskClass === 'risk-high' ? 'danger' : riskClass === 'risk-moderate' ? 'warning' : 'success'}">${reading.status.replace('_', ' ')}</span></p>
+            <small class="text-muted">Updated: ${new Date(reading.timestamp).toLocaleTimeString()}</small>
+        </div>
+    `;
+    const marker = createGlowingMarker(reading.lat, reading.lng, reading.risk_score, popupHtml);
+    setTimeout(() => { if (map && marker) map.removeLayer(marker); }, 120000);
+}
+
+// Replace addSatelliteDetection to use glowing marker
+function addSatelliteDetection(detection) {
+    if (!map) return;
+    const riskClass = getRiskLevelClass(detection.risk_score);
+    const popupHtml = `
+        <div class="satellite-popup">
+            <h6><i class="fas fa-satellite"></i> ${detection.area_name}</h6>
+            <p><strong>Detection Size:</strong> ${detection.detection_size.toFixed(0)} m²</p>
+            <p><strong>Risk Score:</strong> ${(detection.risk_score * 100).toFixed(1)}%</p>
+            <p><strong>Confidence:</strong> ${(detection.confidence * 100).toFixed(1)}%</p>
+            <p><strong>Source:</strong> ${detection.source}</p>
+            <p><strong>Method:</strong> ${detection.method}</p>
+            <small class="text-muted">Detected: ${new Date(detection.timestamp).toLocaleTimeString()}</small>
+        </div>
+    `;
+    const marker = createGlowingMarker(detection.lat, detection.lng, detection.risk_score, popupHtml);
+    setTimeout(() => { if (map && marker) map.removeLayer(marker); }, 300000);
+}
+
+// Replace addCleanupReportMarker to use glowing marker (always green)
+function addCleanupReportMarker(report) {
+    if (!map) return;
+    const popupHtml = `
+        <div class="cleanup-popup">
+            <h6><i class="fas fa-hands-helping"></i> ${report.location}</h6>
+            <p><strong>Total Items:</strong> ${report.total_items}</p>
+            <p><strong>Plastic Bottles:</strong> ${report.plastic_items.plastic_bottles}</p>
+            <p><strong>Plastic Bags:</strong> ${report.plastic_items.plastic_bags}</p>
+            <p><strong>Food Wrappers:</strong> ${report.plastic_items.food_wrappers}</p>
+            <p><strong>Team:</strong> ${report.submitted_by}</p>
+            <small class="text-muted">Reported: ${new Date(report.timestamp).toLocaleTimeString()}</small>
+        </div>
+    `;
+    // Always use low risk color for cleanup marker
+    const marker = createGlowingMarker(report.lat, report.lng, 0.2, popupHtml);
+    setTimeout(() => { if (map && marker) map.removeLayer(marker); }, 600000);
+}
+
 // Cleanup function to destroy map
 function destroyMap() {
     if (map) {

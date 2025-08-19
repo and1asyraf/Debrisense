@@ -1,0 +1,203 @@
+# DebriSense Prototype Demonstration Flow
+## For Mentor Presentation
+
+---
+
+## 🎯 **Demonstration Overview**
+**Duration**: 15-20 minutes  
+**Goal**: Show how DebriSense solves Malaysia's marine plastic pollution crisis through AI-powered intelligence
+
+---
+
+## 🚀 **Demonstration Flow**
+
+### **1. Introduction (2-3 minutes)**
+**Start with**: `index.html` (Homepage)
+
+**Key Points**:
+- **Problem**: Malaysia's marine plastic crisis - no centralized system for mapping debris flow
+- **Solution**: DebriSense - AI-powered environmental intelligence platform
+- **Target Users**: NGOs, government agencies, cleanup organizers
+- **Geographic Scope**: National coverage (Peninsular Malaysia, Sabah, Sarawak)
+
+**Demo Actions**:
+- Show welcome page with key statistics
+- Highlight main navigation options
+- Explain "Smarter Predictions, Cleaner Coasts" vision
+
+---
+
+### **2. Core Dashboard - Interactive Risk Mapping (5-6 minutes)**
+**Navigate to**: `dashboard.html`
+
+**User Story**: Government Environmental Officer identifying high-risk rivers
+
+**Key Features**:
+1. **Interactive Heatmap**
+   - Show color-coded risk zones across Malaysia
+   - Hover over regions to show tooltips
+   - Click on high-risk zone (e.g., Klang River Basin)
+
+2. **Filter Controls**
+   - Demonstrate state filter (select "Selangor")
+   - Show river filter options
+   - Toggle between Northeast/Southwest monsoon seasons
+
+3. **Detail Panel**
+   - Click region to show risk details
+   - Display ML prediction scores
+   - Show top pollution types
+
+**Talking Points**:
+- "This heatmap shows current and predicted pollution risk zones"
+- "The ML model considers river proximity, population density, and seasonal patterns"
+
+---
+
+### **3. ML Insights - Predictive Analytics (4-5 minutes)**
+**Navigate to**: `insights.html`
+
+**User Story**: Data Scientist comparing past vs. predicted hotspots
+
+**Key Features**:
+1. **Seasonal Risk Trends**
+   - Show line graph of risk scores over time
+   - Explain seasonal patterns (monsoon effects)
+
+2. **Regional Comparisons**
+   - Display bar chart of top 5 riskiest regions
+   - Show how different states compare
+
+3. **Export Functionality**
+   - Demonstrate CSV export for reports
+
+**Talking Points**:
+- "Our ML model uses historical cleanup data, satellite imagery, and hydrological data"
+- "Predictions help stakeholders prepare for seasonal pollution events"
+
+---
+
+### **4. Cleanup Reports - Data Collection (3-4 minutes)**
+**Navigate to**: `reports.html`
+
+**User Story**: NGO Cleanup Coordinator logging cleanup events
+
+**Key Features**:
+1. **Report Listing**
+   - Show existing cleanup reports
+   - Display top polluting item types
+   - Filter by state, river, or date
+
+2. **Add New Report**
+   - Demonstrate "Add Report" form
+   - Fill out sample data
+   - Show data integration
+
+**Talking Points**:
+- "Cleanup teams can log activities to improve predictions"
+- "Creates a feedback loop - more data means better predictions"
+
+---
+
+### **5. NGO Tools - Action Planning (2-3 minutes)**
+**Navigate to**: `tools.html`
+
+**User Story**: NGO planning cleanup events
+
+**Key Features**:
+1. **Cleanup Calendar**
+   - Show upcoming/past cleanup events
+
+2. **Regional Scorecards**
+   - Display risk + cleanup activity summaries
+   - Show recommended actions
+
+3. **Exportable Reports**
+   - Demonstrate CSV export for stakeholders
+
+**Talking Points**:
+- "These tools help NGOs plan more effective cleanup campaigns"
+- "Data-driven targeting increases cleanup efficiency"
+
+---
+
+## 🎯 **Key Demonstration Scenarios**
+
+### **Scenario 1: Monsoon Season Planning**
+1. Start on dashboard with Northeast Monsoon selected
+2. Show high-risk zones in Selangor/Klang River
+3. Switch to Southwest Monsoon to show different patterns
+4. Navigate to insights to show seasonal trend analysis
+
+### **Scenario 2: NGO Cleanup Coordination**
+1. Show existing cleanup reports for a specific region
+2. Add a new cleanup report
+3. Show how new data affects risk predictions
+
+### **Scenario 3: Government Decision Support**
+1. Use filters to focus on high-risk areas
+2. Show detailed risk analysis for specific regions
+3. Demonstrate export capabilities for policy planning
+
+---
+
+## 💡 **Technical Highlights**
+
+### **Data Sources**
+- Satellite imagery (Sentinel-2 with Floating Debris Index)
+- Beach cleanup records (Reef Check Malaysia)
+- HydroSHEDS DEM flow data
+- Population density data
+
+### **ML Integration**
+- Predictive modeling for seasonal risk zones
+- Historical pattern analysis
+- Confidence scoring for predictions
+
+### **Technology Stack**
+- Frontend: HTML, CSS, JavaScript (Bootstrap, Chart.js, Leaflet.js)
+- Future backend: Python (Flask/Django)
+- Geospatial visualization with interactive maps
+
+---
+
+## 🚨 **Potential Questions & Answers**
+
+### **Q: How accurate are the predictions?**
+A: "The ML model uses historical cleanup data, satellite imagery, and hydrological patterns. While this is a prototype, the model framework is designed to improve accuracy as more data becomes available."
+
+### **Q: How does this differ from existing solutions?**
+A: "Most solutions focus on real-time IoT sensors or floating devices. DebriSense provides historical and predictive intelligence using data fusion and analytics - helping stakeholders plan proactively rather than reactively."
+
+### **Q: What's the implementation timeline?**
+A: "This prototype demonstrates the core functionality. Full implementation would require backend development, real data integration, and stakeholder partnerships."
+
+---
+
+## 🎬 **Demo Tips**
+
+### **Before the Demo**
+- Test all features thoroughly
+- Prepare specific examples for each region
+- Have backup data ready
+
+### **During the Demo**
+- Keep explanations concise and focused
+- Use real-world examples (mention specific Malaysian rivers/regions)
+- Emphasize the practical value for stakeholders
+
+### **After the Demo**
+- Be ready to discuss technical implementation details
+- Show enthusiasm for the project's environmental impact
+
+---
+
+## 🎯 **Call to Action**
+
+End by emphasizing:
+- The urgent need for marine pollution solutions in Malaysia
+- How DebriSense addresses a real gap in current capabilities
+- The potential for significant environmental impact
+- Next steps for development and stakeholder engagement
+
+**"DebriSense represents a data-driven approach to solving Malaysia's marine plastic crisis - turning information into action for cleaner coasts."**

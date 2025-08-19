@@ -45,6 +45,8 @@ function loadComponents() {
             .then(response => response.text())
             .then(html => {
                 navbarPlaceholder.innerHTML = html;
+                // Add custom CSS for dropdown positioning
+                addDropdownStyles();
             })
             .catch(error => console.error('Error loading navbar:', error));
     }
@@ -252,6 +254,63 @@ function resetMockData() {
     location.reload();
 }
 
+function logout() {
+    // Show confirmation dialog
+    if (confirm('Are you sure you want to logout?')) {
+        // Show logout notification
+        showNotification('Logging out...', 'info');
+        
+        // Clear any stored session data (if any)
+        localStorage.removeItem('debrisense_user');
+        sessionStorage.clear();
+        
+        // Redirect to login page after a short delay
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1500);
+    }
+}
+
+// Add custom styles for dropdown positioning
+function addDropdownStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .dropdown-menu-end {
+            right: 0 !important;
+            left: auto !important;
+        }
+        
+        @media (max-width: 768px) {
+            .dropdown-menu-end {
+                right: auto !important;
+                left: 0 !important;
+                min-width: 200px;
+            }
+        }
+        
+        .navbar-nav .dropdown-menu {
+            margin-top: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            z-index: 9999 !important;
+        }
+        
+        .dropdown-menu {
+            z-index: 9999 !important;
+        }
+        
+        .navbar-nav .dropdown {
+            z-index: 9999 !important;
+        }
+        
+        /* Ensure dropdown items are also on top */
+        .dropdown-item {
+            z-index: 9999 !important;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
 // Show notification
 function showNotification(message, type = 'info') {
     const alertDiv = document.createElement('div');
@@ -311,5 +370,6 @@ window.DebriSense = {
     showNotification,
     exportAllData,
     resetMockData,
-    toggleSeason
+    toggleSeason,
+    logout
 }; 
