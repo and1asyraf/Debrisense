@@ -2,12 +2,11 @@
 // Implements comprehensive Leaflet map with heatmap, filters, and interactive features
 
 let map;
-let heatmapLayer = null;
-let regionPolygons = [];
+let riverMarkers = [];
 let dashboardFilters = {
     state: '',
     river: '',
-    pollutionTypes: ['Plastic Bottles', 'Plastic Bags', 'Food Wrappers', 'Straws', 'Fishing Gear', 'Others'],
+    pollutionTypes: ['Plastic Bottles', 'Plastic Bags', 'Food Wrappers', 'Straws', 'Cigarette Butts', 'Fishing Gear'],
     startDate: '2024-07-01',
     endDate: '2024-10-15'
 };
@@ -96,23 +95,18 @@ function initializeEnhancedMap() {
             console.log('✅ Fallback tile layer added');
         });
         
-        // Create heatmap overlay
-        console.log('🔥 Creating heatmap overlay...');
-        createHeatmapOverlay();
-        
-        // Create clickable region polygons
-        console.log('📊 Creating region polygons...');
-        createRegionPolygons();
+        // Create river location markers
+        console.log('📍 Creating river location markers...');
+        createRiverMarkers();
         
         // Add map controls and UI elements
         addMapControls();
         addMapLegend();
         addInfoPanel();
         
-        // Add zoom event listener to update polygon sizes and heatmap
+        // Add zoom event listener to update marker sizes
         map.on('zoomend', function() {
-            updatePolygonSizes();
-            updateHeatmapSize();
+            updateMarkerSizes();
         });
         
         console.log('✅ Enhanced map initialized successfully');
@@ -122,65 +116,386 @@ function initializeEnhancedMap() {
     }
 }
 
-// Create heatmap overlay from filtered data
-function createHeatmapOverlay() {
-    if (typeof L.heatLayer === 'undefined') {
-        console.error('❌ Heatmap plugin not available. Falling back to zone polygons only.');
-        return;
-    }
+// Create river location markers
+function createRiverMarkers() {
+    console.log('📍 Creating river location markers...');
     
-    console.log('🔥 Creating heatmap data points...');
+    // Clear existing markers
+    clearRiverMarkers();
     
-    // Get filtered data
-    const filteredZones = getFilteredZones();
+    // Get river coordinates from mock data
+    const riverData = mockData.riverCoordinates || [];
+    console.log('River data available:', riverData.length, 'rivers');
+    console.log('Sample river data:', riverData[0]);
     
-    // Convert zones to heatmap data points
-    const heatmapData = filteredZones.map(zone => {
-        const coordinates = getZoneCoordinates(zone);
-        if (!coordinates) return null;
-        
-        // Calculate center point
-        const centerLat = (coordinates[0][0] + coordinates[1][0]) / 2;
-        const centerLng = (coordinates[0][1] + coordinates[1][1]) / 2;
-        
-        return {
-            lat: centerLat,
-            lng: centerLng,
-            intensity: zone.predicted_risk_score
-        };
-    }).filter(point => point !== null);
+    // Filter rivers based on current filters
+    const filteredRivers = filterRivers(riverData);
     
-    console.log(`✅ Created ${heatmapData.length} heatmap data points`);
+    console.log(`📍 Creating ${filteredRivers.length} river markers`);
+    console.log('Filtered rivers:', filteredRivers.map(r => r.name));
     
-    try {
-        // Remove existing heatmap layer
-        if (heatmapLayer) {
-            map.removeLayer(heatmapLayer);
+    filteredRivers.forEach(river => {
+        try {
+            console.log(`Creating marker for ${river.name} at coordinates:`, river.coordinates);
+            
+            // Get river risk data
+            const riverRiskData = getRiverRiskData(river.name);
+            console.log(`Risk data for ${river.name}:`, riverRiskData);
+            
+            // Create custom marker icon based on risk level
+            const markerIcon = createRiverMarkerIcon(riverRiskData.riskScore);
+            console.log(`Created icon for ${river.name}:`, markerIcon);
+            
+            // Create marker
+            const marker = L.marker(river.coordinates, {
+                icon: markerIcon,
+                title: river.name
+            }).addTo(map);
+            console.log(`Added marker to map for ${river.name}`);
+            
+            // Create tooltip content (for hover)
+            const tooltipContent = createRiverTooltipContent(river, riverRiskData);
+            
+            // Add tooltip to marker (appears on hover)
+            marker.bindTooltip(tooltipContent, {
+                direction: 'top',
+                offset: [0, -10],
+                className: 'river-tooltip',
+                permanent: false
+            });
+            
+            // Add click event to show detailed insights
+            marker.on('click', function() {
+                showRiverInsights(river, riverRiskData);
+            });
+            
+            // Store marker reference
+            riverMarkers.push(marker);
+            
+        } catch (error) {
+            console.error(`❌ Failed to create marker for ${river.name}:`, error);
+            console.error('Error details:', error.message, error.stack);
         }
-        
-        // Create much smaller, more precise heatmap
-        const zoomLevel = map.getZoom();
-        const heatmapRadius = Math.max(8, 25 - (zoomLevel - 6) * 3); // Much smaller radius
-        const heatmapBlur = Math.max(4, 15 - (zoomLevel - 6) * 2); // Much smaller blur
-        
-        heatmapLayer = L.heatLayer(heatmapData, {
-            radius: heatmapRadius, // Much smaller radius
-            blur: heatmapBlur, // Much smaller blur
-            maxZoom: 10,
-            gradient: {
-                0.0: '#A5D6A7', // Green for low risk
-                0.3: '#A5D6A7',
-                0.31: '#FFF176', // Yellow for moderate risk
-                0.6: '#FFF176',
-                0.61: '#EF5350', // Red for high risk
-                1.0: '#EF5350'
-            }
-        }).addTo(map);
-        
-        console.log('✅ Heatmap layer created and added to map');
-    } catch (error) {
-        console.error('❌ Failed to create heatmap layer:', error);
+    });
+    
+    console.log(`✅ Created ${riverMarkers.length} river markers successfully`);
+    console.log('All markers:', riverMarkers);
+}
+
+// Clear all river markers
+function clearRiverMarkers() {
+    riverMarkers.forEach(marker => {
+        if (map.hasLayer(marker)) {
+            map.removeLayer(marker);
+        }
+    });
+    riverMarkers = [];
+}
+
+// Filter rivers based on current dashboard filters
+function filterRivers(riverData) {
+    let filtered = riverData;
+    
+    // Filter by state
+    if (dashboardFilters.state) {
+        filtered = filtered.filter(river => river.state === dashboardFilters.state);
     }
+    
+    // Filter by river name
+    if (dashboardFilters.river) {
+        filtered = filtered.filter(river => river.name === dashboardFilters.river);
+    }
+    
+    return filtered;
+}
+
+// Get risk data for a specific river
+function getRiverRiskData(riverName) {
+    // Find zones for this river
+    const riverZones = mockData.mlPredictionZones.filter(zone => zone.river_basin === riverName);
+    
+    if (riverZones.length === 0) {
+        return {
+            riskScore: 0.0,
+            pollutionTypes: [],
+            totalReports: 0,
+            lastUpdated: new Date().toISOString()
+        };
+    }
+    
+    // Calculate average risk score
+    const avgRiskScore = riverZones.reduce((sum, zone) => sum + zone.predicted_risk_score, 0) / riverZones.length;
+    
+    // Get unique pollution types
+    const pollutionTypes = [...new Set(riverZones.flatMap(zone => zone.top_pollution_types))];
+    
+    // Get cleanup reports for this river
+    const reports = mockData.cleanupReports.filter(report => report.river === riverName);
+    
+    return {
+        riskScore: avgRiskScore,
+        pollutionTypes: pollutionTypes,
+        totalReports: reports.length,
+        lastUpdated: riverZones[0].last_updated
+    };
+}
+
+// Create custom marker icon based on risk level
+function createRiverMarkerIcon(riskScore) {
+    let color, iconClass;
+    
+    if (riskScore >= 0.6) {
+        color = '#EF5350'; // Red for high risk
+        iconClass = 'fas fa-exclamation-triangle';
+    } else if (riskScore >= 0.3) {
+        color = '#FFF176'; // Yellow for moderate risk
+        iconClass = 'fas fa-exclamation-circle';
+    } else {
+        color = '#A5D6A7'; // Green for low risk
+        iconClass = 'fas fa-check-circle';
+    }
+    
+    return L.divIcon({
+        html: `<i class="${iconClass}" style="color: ${color}; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);"></i>`,
+        className: 'river-marker-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+}
+
+// Create popup content for river marker
+function createRiverPopupContent(river, riskData) {
+    const riskLevel = riskData.riskScore >= 0.6 ? 'High' : riskData.riskScore >= 0.3 ? 'Moderate' : 'Low';
+    const riskColor = riskData.riskScore >= 0.6 ? '#EF5350' : riskData.riskScore >= 0.3 ? '#FFF176' : '#A5D6A7';
+    
+    return `
+        <div class="river-popup-content">
+            <h6 style="margin-bottom: 8px; color: #2E7D32;">
+                <i class="fas fa-water me-2"></i>${river.name}
+            </h6>
+            <p style="margin-bottom: 8px; font-size: 12px; color: #666;">
+                ${river.description}
+            </p>
+            <div style="margin-bottom: 8px;">
+                <span style="background-color: ${riskColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+                    ${riskLevel} Risk (${(riskData.riskScore * 100).toFixed(0)}%)
+                </span>
+            </div>
+            <div style="font-size: 11px; color: #666;">
+                <div><strong>Reports:</strong> ${riskData.totalReports}</div>
+                <div><strong>State:</strong> ${river.state}</div>
+            </div>
+                         <button class="btn btn-sm btn-primary mt-2" onclick="window.showRiverInsights('${river.name}')">
+                 <i class="fas fa-chart-line me-1"></i>View Insights
+             </button>
+        </div>
+    `;
+}
+
+// Create tooltip content for river marker (appears on hover)
+function createRiverTooltipContent(river, riskData) {
+    const riskLevel = riskData.riskScore >= 0.6 ? 'High' : riskData.riskScore >= 0.3 ? 'Moderate' : 'Low';
+    const riskColor = riskData.riskScore >= 0.6 ? '#EF5350' : riskData.riskScore >= 0.3 ? '#FFF176' : '#A5D6A7';
+    
+    return `
+        <div class="river-tooltip-content">
+            <h6 style="margin-bottom: 8px; color: #2E7D32;">
+                <i class="fas fa-water me-2"></i>${river.name}
+            </h6>
+            <p style="margin-bottom: 8px; font-size: 12px; color: #666;">
+                ${river.description}
+            </p>
+            <div style="margin-bottom: 8px;">
+                <span style="background-color: ${riskColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+                    ${riskLevel} Risk (${(riskData.riskScore * 100).toFixed(0)}%)
+                </span>
+            </div>
+            <div style="font-size: 11px; color: #666;">
+                <div><strong>Reports:</strong> ${riskData.totalReports}</div>
+                <div><strong>State:</strong> ${river.state}</div>
+            </div>
+            <div style="margin-top: 8px; font-size: 11px; color: #007bff;">
+                <i class="fas fa-mouse-pointer me-1"></i>Click for detailed insights
+            </div>
+        </div>
+    `;
+}
+
+// Global variables for modal functionality
+let currentRiverData = null;
+let currentRiskData = null;
+let currentChart = null;
+
+// Show detailed river insights modal
+function showRiverInsights(river, riskData) {
+    console.log('📊 Showing insights for:', river.name || river);
+    console.log('River Data:', river);
+    console.log('Risk Data:', riskData);
+    
+    // Store current data globally
+    currentRiverData = typeof river === 'string' ? { name: river } : river;
+    currentRiskData = riskData || {
+        riskScore: 0.0,
+        pollutionTypes: [],
+        totalReports: 0,
+        lastUpdated: new Date().toISOString()
+    };
+    
+    // Update modal title
+    document.getElementById('riverModalTitle').textContent = currentRiverData.name;
+    
+    // Generate modal content
+    const modalContent = generateRiverInsightsContent(currentRiverData, currentRiskData);
+    document.getElementById('riverInsightsContent').innerHTML = modalContent;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('riverInsightsModal'));
+    modal.show();
+}
+
+// Generate comprehensive river insights content
+function generateRiverInsightsContent(river, riskData) {
+    const riskLevel = riskData.riskScore >= 0.6 ? 'High' : riskData.riskScore >= 0.3 ? 'Moderate' : 'Low';
+    const riskClass = riskData.riskScore >= 0.6 ? 'high' : riskData.riskScore >= 0.3 ? 'moderate' : 'low';
+    
+    // Get recent cleanup activities
+    const recentActivities = getRecentActivities(river.name);
+    
+    // Get pollution types data
+    const pollutionData = getPollutionData(river.name);
+    
+    return `
+        <div class="river-insights-header">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4><i class="fas fa-water me-2"></i>${river.name}</h4>
+                    <p class="text-muted mb-0">${river.description || 'Major river in Malaysia'}</p>
+                    <p class="text-muted mb-0"><strong>State:</strong> ${river.state || 'Multiple states'}</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="risk-score-display">
+                        <h5>Risk Score</h5>
+                        <div class="risk-progress">
+                            <div class="risk-progress-bar ${riskClass}" style="width: ${riskData.riskScore * 100}%"></div>
+                        </div>
+                        <h3 class="text-${riskClass === 'high' ? 'danger' : riskClass === 'moderate' ? 'warning' : 'success'}">
+                            ${(riskData.riskScore * 100).toFixed(1)}%
+                        </h3>
+                        <span class="badge bg-${riskClass === 'high' ? 'danger' : riskClass === 'moderate' ? 'warning' : 'success'}">
+                            ${riskLevel} Risk
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">${riskData.totalReports}</div>
+                <div class="stat-label">Cleanup Reports</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${riskData.pollutionTypes.length}</div>
+                <div class="stat-label">Pollution Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${getAverageRiskScore(river.name).toFixed(1)}%</div>
+                <div class="stat-label">Avg Risk (30 days)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${getLastCleanupDays(river.name)}</div>
+                <div class="stat-label">Days Since Last Cleanup</div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="recent-activities">
+                    <h6><i class="fas fa-history me-2"></i>Recent Activities</h6>
+                    ${recentActivities.length > 0 ? 
+                        recentActivities.map(activity => `
+                            <div class="activity-item">
+                                <div class="activity-title">${activity.title}</div>
+                                <div class="activity-details">${activity.details}</div>
+                                <div class="activity-date">${activity.date}</div>
+                            </div>
+                        `).join('') : 
+                        '<p class="text-muted">No recent activities recorded</p>'
+                    }
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="recent-activities">
+                    <h6><i class="fas fa-trash me-2"></i>Pollution Types Found</h6>
+                    <div class="pollution-types">
+                        ${riskData.pollutionTypes.length > 0 ? 
+                            riskData.pollutionTypes.map(type => `
+                                <span class="pollution-tag">${type}</span>
+                            `).join('') : 
+                            '<p class="text-muted">No pollution data available</p>'
+                        }
+                    </div>
+                    <div class="mt-3">
+                        <h6>Historical Trends</h6>
+                        <p class="text-muted">Risk levels have been ${getTrendDescription(river.name)} over the past 3 months.</p>
+                        <small class="text-muted">Last updated: ${new Date(riskData.lastUpdated).toLocaleDateString()}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Helper functions for modal data
+function getRecentActivities(riverName) {
+    const reports = mockData.cleanupReports.filter(report => report.river === riverName);
+    return reports.slice(0, 3).map(report => ({
+        title: `Cleanup at ${report.location}`,
+        details: `${getTotalItems(report.plastic_items)} items collected by ${report.submitted_by}`,
+        date: new Date(report.date).toLocaleDateString()
+    }));
+}
+
+function getPollutionData(riverName) {
+    const zones = mockData.mlPredictionZones.filter(zone => zone.river_basin === riverName);
+    return zones.length > 0 ? zones[0].top_pollution_types : [];
+}
+
+function getAverageRiskScore(riverName) {
+    const zones = mockData.mlPredictionZones.filter(zone => zone.river_basin === riverName);
+    if (zones.length === 0) return 0;
+    const avgScore = zones.reduce((sum, zone) => sum + zone.predicted_risk_score, 0) / zones.length;
+    return avgScore * 100;
+}
+
+function getLastCleanupDays(riverName) {
+    const reports = mockData.cleanupReports.filter(report => report.river === riverName);
+    if (reports.length === 0) return 'N/A';
+    const lastReport = reports.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    const daysDiff = Math.floor((new Date() - new Date(lastReport.date)) / (1000 * 60 * 60 * 24));
+    return daysDiff;
+}
+
+function getTrendDescription(riverName) {
+    const zones = mockData.mlPredictionZones.filter(zone => zone.river_basin === riverName);
+    if (zones.length === 0) return 'stable';
+    const avgScore = zones.reduce((sum, zone) => sum + zone.predicted_risk_score, 0) / zones.length;
+    if (avgScore > 0.6) return 'increasing';
+    if (avgScore < 0.3) return 'decreasing';
+    return 'stable';
+}
+
+// Update marker sizes based on zoom level
+function updateMarkerSizes() {
+    const zoomLevel = map.getZoom();
+    const baseSize = Math.max(20, 30 - (zoomLevel - 6) * 2);
+    
+    riverMarkers.forEach(marker => {
+        const icon = marker.getIcon();
+        icon.options.iconSize = [baseSize, baseSize];
+        icon.options.iconAnchor = [baseSize/2, baseSize/2];
+        marker.setIcon(icon);
+    });
 }
 
 // Create precise river basin shapes based on actual river geography
@@ -502,11 +817,8 @@ function applyMapFilters() {
     console.log('🔄 Applying map filters...');
     
     try {
-        // Update heatmap
-        createHeatmapOverlay();
-        
-        // Update region polygons
-        createRegionPolygons();
+        // Update river markers
+        createRiverMarkers();
         
         // Update stats
         updateDashboardStats();
@@ -527,12 +839,13 @@ function applyMapFilters() {
 // Update map description
 function updateMapDescription() {
     const descriptionElement = document.getElementById('mapDescription');
-    const filteredZones = getFilteredZones();
+    const riverData = mockData.riverCoordinates || [];
+    const filteredRivers = filterRivers(riverData);
     
-    if (filteredZones.length === mockData.mlPredictionZones.length) {
-        descriptionElement.textContent = 'Interactive heatmap showing pollution risk zones across Malaysia';
+    if (filteredRivers.length === riverData.length) {
+        descriptionElement.textContent = 'Interactive map showing river locations with pollution risk insights. Click on markers for detailed information.';
     } else {
-        descriptionElement.textContent = `Showing ${filteredZones.length} filtered zones across Malaysia`;
+        descriptionElement.textContent = `Showing ${filteredRivers.length} filtered rivers with pollution risk insights. Click on markers for detailed information.`;
     }
 }
 
@@ -1241,5 +1554,322 @@ window.dashboardFunctions = {
     destroyMap
 };
 
-// Make applyMapFilters globally available
-window.applyMapFilters = applyMapFilters; 
+// Chart and Modal Functions
+function showChartOptions() {
+    const modal = new bootstrap.Modal(document.getElementById('chartOptionsModal'));
+    modal.show();
+}
+
+function showPollutionBarChart() {
+    if (!currentRiverData) return;
+    
+    const pollutionData = getPollutionChartData(currentRiverData.name);
+    
+    document.getElementById('chartModalTitle').innerHTML = '<i class="fas fa-chart-bar me-2"></i>Pollution Types - ' + currentRiverData.name;
+    
+    const ctx = document.getElementById('chartCanvas').getContext('2d');
+    
+    if (currentChart) {
+        currentChart.destroy();
+    }
+    
+    currentChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: pollutionData.labels,
+            datasets: [{
+                label: 'Items Found',
+                data: pollutionData.data,
+                backgroundColor: [
+                    '#A5D6A7', '#66BB6A', '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20'
+                ],
+                borderColor: '#2E7D32',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Pollution Types Distribution'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Items'
+                    }
+                }
+            }
+        }
+    });
+    
+    const modal = new bootstrap.Modal(document.getElementById('chartDisplayModal'));
+    modal.show();
+}
+
+function showRiskLineChart() {
+    if (!currentRiverData) return;
+    
+    const riskData = getRiskHistoryData(currentRiverData.name);
+    
+    document.getElementById('chartModalTitle').innerHTML = '<i class="fas fa-chart-line me-2"></i>Risk History - ' + currentRiverData.name;
+    
+    const ctx = document.getElementById('chartCanvas').getContext('2d');
+    
+    if (currentChart) {
+        currentChart.destroy();
+    }
+    
+    currentChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: riskData.labels,
+            datasets: [{
+                label: 'Risk Score (%)',
+                data: riskData.data,
+                borderColor: '#EF5350',
+                backgroundColor: 'rgba(239, 83, 80, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Risk Score Trends (Last 6 Months)'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Risk Score (%)'
+                    }
+                }
+            }
+        }
+    });
+    
+    const modal = new bootstrap.Modal(document.getElementById('chartDisplayModal'));
+    modal.show();
+}
+
+function showDataPieChart() {
+    if (!currentRiverData) return;
+    
+    const pieData = getPieChartData(currentRiverData.name);
+    
+    document.getElementById('chartModalTitle').innerHTML = '<i class="fas fa-chart-pie me-2"></i>Data Distribution - ' + currentRiverData.name;
+    
+    const ctx = document.getElementById('chartCanvas').getContext('2d');
+    
+    if (currentChart) {
+        currentChart.destroy();
+    }
+    
+    currentChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: pieData.labels,
+            datasets: [{
+                data: pieData.data,
+                backgroundColor: [
+                    '#A5D6A7', '#66BB6A', '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Data Distribution Overview'
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    
+    const modal = new bootstrap.Modal(document.getElementById('chartDisplayModal'));
+    modal.show();
+}
+
+// Chart data helper functions
+function getPollutionChartData(riverName) {
+    const reports = mockData.cleanupReports.filter(report => report.river === riverName);
+    const pollutionTypes = ['Plastic Bottles', 'Plastic Bags', 'Food Wrappers', 'Straws', 'Cigarette Butts', 'Fishing Gear'];
+    
+    const data = pollutionTypes.map(type => {
+        return reports.reduce((sum, report) => {
+            const key = type.toLowerCase().replace(' ', '_');
+            return sum + (report.plastic_items[key] || 0);
+        }, 0);
+    });
+    
+    return {
+        labels: pollutionTypes,
+        data: data
+    };
+}
+
+function getRiskHistoryData(riverName) {
+    // Generate mock historical data for the last 6 months
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const baseRisk = getAverageRiskScore(riverName);
+    
+    const data = months.map((month, index) => {
+        const variation = (Math.random() - 0.5) * 20; // ±10% variation
+        return Math.max(0, Math.min(100, baseRisk + variation));
+    });
+    
+    return {
+        labels: months,
+        data: data
+    };
+}
+
+function getPieChartData(riverName) {
+    const reports = mockData.cleanupReports.filter(report => report.river === riverName);
+    const zones = mockData.mlPredictionZones.filter(zone => zone.river_basin === riverName);
+    
+    const totalReports = reports.length;
+    const totalZones = zones.length;
+    const avgRisk = getAverageRiskScore(riverName);
+    const pollutionTypes = currentRiskData ? currentRiskData.pollutionTypes.length : 0;
+    
+    return {
+        labels: ['Cleanup Reports', 'Risk Zones', 'Pollution Types', 'Avg Risk Level'],
+        data: [totalReports, totalZones, pollutionTypes, Math.round(avgRisk)]
+    };
+}
+
+// Action button functions
+function exportRiverData() {
+    if (!currentRiverData) return;
+    
+    const dataToExport = {
+        river: currentRiverData.name,
+        riskData: currentRiskData,
+        reports: mockData.cleanupReports.filter(report => report.river === currentRiverData.name),
+        zones: mockData.mlPredictionZones.filter(zone => zone.river_basin === currentRiverData.name),
+        exportDate: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${currentRiverData.name.replace(/\s+/g, '_')}_data_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    DebriSense.showNotification('River data exported successfully', 'success');
+}
+
+function viewPastReports() {
+    if (!currentRiverData) return;
+    
+    const reports = mockData.cleanupReports.filter(report => report.river === currentRiverData.name);
+    
+    let reportsHtml = '<h6>Past Cleanup Reports</h6>';
+    
+    if (reports.length > 0) {
+        reportsHtml += reports.map(report => `
+            <div class="activity-item">
+                <div class="activity-title">${report.location}</div>
+                <div class="activity-details">
+                    ${getTotalItems(report.plastic_items)} items collected by ${report.submitted_by}
+                </div>
+                <div class="activity-date">${new Date(report.date).toLocaleDateString()}</div>
+            </div>
+        `).join('');
+    } else {
+        reportsHtml += '<p class="text-muted">No past reports found for this river.</p>';
+    }
+    
+    // Show in a simple alert for now (could be enhanced to a modal)
+    alert(`Past Reports for ${currentRiverData.name}:\n\n${reports.length} reports found.`);
+}
+
+function addNewReport() {
+    if (!currentRiverData) return;
+    
+    // Set the river name in the form
+    document.getElementById('reportRiver').value = currentRiverData.name;
+    document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
+    
+    // Show the add report modal
+    const modal = new bootstrap.Modal(document.getElementById('addReportModal'));
+    modal.show();
+}
+
+function submitReport() {
+    const form = document.getElementById('addReportForm');
+    const formData = new FormData(form);
+    
+    // Validate required fields
+    if (!formData.get('reportDate')) {
+        alert('Please select a date');
+        return;
+    }
+    
+    // Create new report object
+    const newReport = {
+        river: document.getElementById('reportRiver').value,
+        location: document.getElementById('reportLocation').value || 'Unknown Location',
+        date: document.getElementById('reportDate').value,
+        submitted_by: document.getElementById('reportTeam').value || 'Anonymous Team',
+        plastic_items: {
+            plastic_bottles: parseInt(document.getElementById('plasticBottles').value) || 0,
+            plastic_bags: parseInt(document.getElementById('plasticBags').value) || 0,
+            food_wrappers: parseInt(document.getElementById('foodWrappers').value) || 0,
+            straws: parseInt(document.getElementById('straws').value) || 0
+        },
+        notes: document.getElementById('reportNotes').value || '',
+        timestamp: new Date().toISOString()
+    };
+    
+    // Add to mock data (in real app, this would be sent to server)
+    mockData.cleanupReports.push(newReport);
+    
+    // Close modal and show success message
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addReportModal'));
+    modal.hide();
+    
+    // Reset form
+    form.reset();
+    
+    DebriSense.showNotification('Cleanup report submitted successfully!', 'success');
+    
+    // Refresh the current modal if it's open
+    if (currentRiverData) {
+        showRiverInsights(currentRiverData, currentRiskData);
+    }
+}
+
+// Make functions globally available
+window.applyMapFilters = applyMapFilters;
+window.showRiverInsights = showRiverInsights;
+window.showChartOptions = showChartOptions;
+window.showPollutionBarChart = showPollutionBarChart;
+window.showRiskLineChart = showRiskLineChart;
+window.showDataPieChart = showDataPieChart;
+window.exportRiverData = exportRiverData;
+window.viewPastReports = viewPastReports;
+window.addNewReport = addNewReport;
+window.submitReport = submitReport; 

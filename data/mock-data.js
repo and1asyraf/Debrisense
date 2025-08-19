@@ -1147,6 +1147,76 @@ const mockData = {
         "Sungai Muda", "Sungai Kelantan", "Sungai Terengganu"
     ],
 
+    // River Coordinates for Map Markers
+    riverCoordinates: [
+        {
+            name: "Sungai Klang",
+            coordinates: [3.0738, 101.5183], // Kuala Lumpur area
+            state: "Selangor",
+            description: "Major river flowing through Kuala Lumpur to Port Klang"
+        },
+        {
+            name: "Sungai Pinang",
+            coordinates: [5.4164, 100.3327], // Penang area
+            state: "Penang",
+            description: "River flowing through George Town, Penang"
+        },
+        {
+            name: "Sungai Petagas",
+            coordinates: [5.9804, 116.0735], // Kota Kinabalu area
+            state: "Sabah",
+            description: "River near Kota Kinabalu, Sabah"
+        },
+        {
+            name: "Sungai Johor",
+            coordinates: [1.4927, 103.7414], // Johor Bahru area
+            state: "Johor",
+            description: "Major river in Johor state"
+        },
+        {
+            name: "Sungai Linggi",
+            coordinates: [2.4539, 101.8667], // Port Dickson area
+            state: "Negeri Sembilan",
+            description: "River flowing to Port Dickson"
+        },
+        {
+            name: "Sungai Muar",
+            coordinates: [2.0442, 102.5689], // Muar area
+            state: "Johor",
+            description: "River in Muar, Johor"
+        },
+        {
+            name: "Sungai Pahang",
+            coordinates: [3.8077, 103.3260], // Kuantan area
+            state: "Pahang",
+            description: "Longest river in Peninsular Malaysia"
+        },
+        {
+            name: "Sungai Perak",
+            coordinates: [4.5921, 100.6348], // Perak area
+            state: "Perak",
+            description: "Major river in Perak state"
+        },
+        {
+            name: "Sungai Muda",
+            coordinates: [5.4204, 100.3778], // Kedah area
+            state: "Kedah",
+            description: "River in Kedah state"
+        },
+        {
+            name: "Sungai Kelantan",
+            coordinates: [6.1185, 102.3273], // Kota Bharu area
+            state: "Kelantan",
+            description: "Major river in Kelantan state"
+        },
+        {
+            name: "Sungai Terengganu",
+            coordinates: [5.3296, 103.1370], // Kuala Terengganu area
+            state: "Terengganu",
+            description: "River in Terengganu state"
+        }
+    ],
+
     // Pollution Types
     pollutionTypes: [
         "Plastic Bottles", "Plastic Bags", "Food Wrappers", "Straws",
