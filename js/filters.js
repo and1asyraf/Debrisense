@@ -344,11 +344,11 @@ class FilterManager {
         const applyBtn = document.getElementById('applyFiltersBtn');
         if (applyBtn) {
             if (hasChanges) {
-                applyBtn.classList.add('pending');
-                applyBtn.innerHTML = 'Apply (Pending)';
+                applyBtn.classList.remove('inactive');
+                applyBtn.classList.add('active');
             } else {
-                applyBtn.classList.remove('pending');
-                applyBtn.innerHTML = 'Apply';
+                applyBtn.classList.remove('active');
+                applyBtn.classList.add('inactive');
             }
         }
     }
@@ -699,11 +699,11 @@ function updateFilterButtonState() {
                            globalFilters.pollutionTypes.length < 6;
     
     if (hasActiveFilters) {
-        applyButton.classList.add('btn-warning');
-        applyButton.innerHTML = 'Apply';
+        applyButton.classList.remove('inactive');
+        applyButton.classList.add('active');
     } else {
-        applyButton.classList.remove('btn-warning');
-        applyButton.innerHTML = 'Apply';
+        applyButton.classList.remove('active');
+        applyButton.classList.add('inactive');
     }
 }
 

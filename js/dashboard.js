@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
             initializeEnhancedMap();
             setupFilterListeners();
             updateDashboardStats();
+            updateApplyButtonState(); // Set initial button state
             console.log('✅ Enhanced Dashboard setup complete');
         } catch (error) {
             console.error('❌ Enhanced Dashboard initialization failed:', error);
@@ -762,14 +763,14 @@ function setupFilterListeners() {
     document.getElementById('stateFilter').addEventListener('change', function() {
         dashboardFilters.state = this.value;
         updateFilterStatus();
-        applyMapFilters(); // Apply filters immediately when state changes
+        updateApplyButtonState(); // Update button state instead of applying immediately
     });
     
     // River filter
     document.getElementById('riverFilter').addEventListener('change', function() {
         dashboardFilters.river = this.value;
         updateFilterStatus();
-        applyMapFilters(); // Apply filters immediately when river changes
+        updateApplyButtonState(); // Update button state instead of applying immediately
     });
     
     // Pollution type filters
@@ -779,7 +780,7 @@ function setupFilterListeners() {
         if (element) {
             element.addEventListener('change', function() {
                 updatePollutionTypeFilters();
-                applyMapFilters(); // Apply filters immediately when pollution types change
+                updateApplyButtonState(); // Update button state instead of applying immediately
             });
         }
     });
@@ -792,7 +793,7 @@ function setupFilterListeners() {
         startDateElement.addEventListener('change', function() {
             dashboardFilters.startDate = this.value;
             updateFilterStatus();
-            applyMapFilters(); // Apply filters immediately when date changes
+            updateApplyButtonState(); // Update button state instead of applying immediately
         });
     }
     
@@ -800,7 +801,7 @@ function setupFilterListeners() {
         endDateElement.addEventListener('change', function() {
             dashboardFilters.endDate = this.value;
             updateFilterStatus();
-            applyMapFilters(); // Apply filters immediately when date changes
+            updateApplyButtonState(); // Update button state instead of applying immediately
         });
     }
 }
@@ -826,6 +827,25 @@ function updatePollutionTypeFilters() {
     });
     
     updateFilterStatus();
+}
+
+// Update Apply button state based on filter changes
+function updateApplyButtonState() {
+    const applyBtn = document.getElementById('applyFiltersBtn');
+    if (!applyBtn) return;
+    
+    // Check if any filters are different from default state
+    const hasChanges = dashboardFilters.state !== '' || 
+                      dashboardFilters.river !== '' || 
+                      dashboardFilters.pollutionTypes.length < 6;
+    
+    if (hasChanges) {
+        applyBtn.classList.remove('inactive');
+        applyBtn.classList.add('active');
+    } else {
+        applyBtn.classList.remove('active');
+        applyBtn.classList.add('inactive');
+    }
 }
 
 // Update filter status display
@@ -861,6 +881,13 @@ function applyMapFilters() {
         
         // Update map description
         updateMapDescription();
+        
+        // Reset Apply button to inactive state after applying
+        const applyBtn = document.getElementById('applyFiltersBtn');
+        if (applyBtn) {
+            applyBtn.classList.remove('active');
+            applyBtn.classList.add('inactive');
+        }
         
         console.log('✅ Map filters applied successfully');
         
@@ -902,6 +929,13 @@ function clearFilters() {
         
         // Update filter status
         updateFilterStatus();
+        
+        // Reset Apply button to inactive state
+        const applyBtn = document.getElementById('applyFiltersBtn');
+        if (applyBtn) {
+            applyBtn.classList.remove('active');
+            applyBtn.classList.add('inactive');
+        }
         
         // Apply cleared filters to map
         applyMapFilters();

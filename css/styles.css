@@ -1134,3 +1134,27 @@ h6 { font-size: 12px; }
 .filter-btn-primary {
     color: white;
 }
+
+/* Apply button states */
+.btn-apply-filters {
+    transition: all 0.3s ease;
+}
+
+.btn-apply-filters.inactive {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: white !important;
+}
+
+.btn-apply-filters.active {
+    background-color: var(--primary-green) !important;
+    border-color: var(--primary-green) !important;
+    color: white !important;
+}
+
+/* Clear button hover effect */
+.btn-clear-filters:hover {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+}
