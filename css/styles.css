@@ -387,19 +387,22 @@ h6 { font-size: 12px; }
 /* Stats Cards */
 .stats-card {
     text-align: center;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-sm);
 }
 
 .stats-number {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
     color: var(--primary-green);
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .stats-label {
     color: var(--text-light);
-    font-size: 14px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -1055,6 +1058,9 @@ h6 { font-size: 12px; }
     font-weight: bold;
     color: var(--primary-green);
     margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .stat-label {
@@ -1117,4 +1123,14 @@ h6 { font-size: 12px; }
 #chartCanvas {
     max-width: 100%;
     height: auto;
+}
+
+/* Filter Button Styles */
+.filter-btn {
+    height: 38px;
+    font-size: 14px;
+}
+
+.filter-btn-primary {
+    color: white;
 }

@@ -345,10 +345,10 @@ class FilterManager {
         if (applyBtn) {
             if (hasChanges) {
                 applyBtn.classList.add('pending');
-                applyBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Apply Filters (Pending)';
+                applyBtn.innerHTML = 'Apply (Pending)';
             } else {
                 applyBtn.classList.remove('pending');
-                applyBtn.innerHTML = '<i class="fas fa-filter me-2"></i>Apply Filters';
+                applyBtn.innerHTML = 'Apply';
             }
         }
     }
@@ -700,10 +700,10 @@ function updateFilterButtonState() {
     
     if (hasActiveFilters) {
         applyButton.classList.add('btn-warning');
-        applyButton.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Apply Filters';
+        applyButton.innerHTML = 'Apply';
     } else {
         applyButton.classList.remove('btn-warning');
-        applyButton.innerHTML = '<i class="fas fa-filter me-2"></i>Apply Filters';
+        applyButton.innerHTML = 'Apply';
     }
 }
 

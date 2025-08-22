@@ -995,15 +995,15 @@ const mockData = {
         },
         
         // Additional Low Risk Zones
-        {
-            id: "ZONE039",
-            state: "Putrajaya",
-            river_basin: "Sungai Putrajaya Timur",
-            season: "Northeast Monsoon",
-            predicted_risk_score: 0.41,
+        { 
+            id: "ZONE039", 
+            state: "Putrajaya", 
+            river_basin: "Sungai Putrajaya Timur", 
+            season: "Northeast Monsoon", 
+            predicted_risk_score: 0.41, 
             top_pollution_types: ["Plastic Bottles", "Food Wrappers", "Plastic Bags"],
-            last_updated: "2024-10-15T10:30:00Z"
-        },
+            last_updated: "2024-10-15T10:30:00Z" 
+        }, 
         {
             id: "ZONE040",
             state: "Kuala Lumpur",

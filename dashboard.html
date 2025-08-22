@@ -146,11 +146,11 @@
                                         <div class="filter-group">
                                             <label class="form-label">&nbsp;</label>
                                             <div class="d-flex gap-2">
-                                                <button class="btn btn-primary flex-fill" id="applyFiltersBtn" onclick="applyMapFilters()">
+                                                <button type="button" class="btn btn-primary flex-fill filter-btn filter-btn-primary" id="applyFiltersBtn" onclick="applyMapFilters()">
                                                     <i class="fas fa-filter me-1"></i>
                                                     Apply
                                                 </button>
-                                                <button class="btn btn-outline-secondary flex-fill" onclick="clearFilters()">
+                                                <button type="button" class="btn btn-outline-secondary flex-fill filter-btn" onclick="clearFilters()">
                                                     <i class="fas fa-times me-1"></i>
                                                     Clear
                                                 </button>
@@ -218,19 +218,19 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-6 mb-3">
+                                    <div class="col-4 mb-3">
                                         <div class="stats-card">
                                             <div class="stats-number" id="totalReports">0</div>
                                             <div class="stats-label">Total Reports</div>
                                         </div>
                                     </div>
-                                    <div class="col-6 mb-3">
+                                    <div class="col-4 mb-3">
                                         <div class="stats-card">
                                             <div class="stats-number" id="avgRiskScore">0.0</div>
                                             <div class="stats-label">Avg Risk Score</div>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-4 mb-3">
                                         <div class="stats-card">
                                             <div class="stats-number" id="highRiskZones">0</div>
                                             <div class="stats-label">High Risk Zones</div>
